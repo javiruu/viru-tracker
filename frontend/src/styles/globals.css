@@ -4845,13 +4845,20 @@ textarea::placeholder {
 }
 
 .private-account-anchor {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  z-index: 90;
-  display: inline-flex;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
   align-items: center;
   gap: 0.55rem;
+  justify-content: flex-end;
+  width: 100%;
+  padding: 10px 16px;
+  min-height: 56px;
+  box-sizing: border-box;
+  background: var(--bg);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
 .private-theme-toggle {
