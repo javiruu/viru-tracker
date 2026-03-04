@@ -4844,6 +4844,10 @@ textarea::placeholder {
   display: none;
 }
 
+.private-content {
+  padding-top: 12px;
+}
+
 .private-account-anchor {
   position: sticky;
   top: 0;
