@@ -1,0 +1,23 @@
+﻿from fastapi.testclient import TestClient
+
+from tests.helpers import register_and_token
+
+
+def test_register_login_and_me(client: TestClient) -> None:
+    token = register_and_token(client)
+    me = client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"})
+    assert me.status_code == 200
+    assert me.json()["email"] == "qa@viru.dev"
+
+
+def test_me_without_token_returns_standardized_auth_error(client: TestClient) -> None:
+    me = client.get("/api/v1/auth/me")
+    assert me.status_code == 401
+    assert me.json()["detail"] == "invalid_auth"
+
+
+def test_login_with_invalid_credentials_returns_standardized_auth_error(client: TestClient) -> None:
+    client.post("/api/v1/auth/register", json={"email": "qa@viru.dev", "password": "Pass1234"})
+    login = client.post("/api/v1/auth/login", json={"email": "qa@viru.dev", "password": "wrong-pass"})
+    assert login.status_code == 401
+    assert login.json()["detail"] == "invalid_auth"
