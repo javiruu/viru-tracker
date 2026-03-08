@@ -1,4 +1,4 @@
-from datetime import datetime
+from app.core.time import utc_now_naive
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from passlib.context import CryptContext
@@ -43,8 +43,8 @@ def login(payload: LoginIn, request: Request, db: Session = Depends(get_db)) -> 
             user_id=user.id,
             device=agent[:200],
             ip=client_ip,
-            last_seen=datetime.utcnow(),
-            created_at=datetime.utcnow(),
+            last_seen=utc_now_naive(),
+            created_at=utc_now_naive(),
             is_active=True,
         )
     )

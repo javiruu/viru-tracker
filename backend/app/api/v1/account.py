@@ -1,4 +1,4 @@
-from datetime import datetime
+from app.core.time import utc_now_naive
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from passlib.context import CryptContext
@@ -92,7 +92,7 @@ def get_sessions(db: Session = Depends(get_db), current_user: User = Depends(get
     sessions = db.scalars(
         select(UserSession)
         .where(UserSession.user_id == current_user.id)
-        .order_by(UserSession.last_seen.desc())
+        .order_by(UserSession.last_seen.desc(), UserSession.id.desc())
     ).all()
     data = [
         {
@@ -116,7 +116,7 @@ def close_all_sessions(
     db.execute(
         update(UserSession)
         .where(UserSession.user_id == current_user.id)
-        .values(is_active=False, last_seen=datetime.utcnow())
+        .values(is_active=False, last_seen=utc_now_naive())
     )
     log_security_event(db, current_user.id, "close_all_sessions", None)
     db.commit()
@@ -146,7 +146,7 @@ def security_activity(
     items = db.scalars(
         select(SecurityActivity)
         .where(SecurityActivity.user_id == current_user.id)
-        .order_by(SecurityActivity.created_at.desc())
+        .order_by(SecurityActivity.created_at.desc(), SecurityActivity.id.desc())
         .limit(20)
     ).all()
     return {

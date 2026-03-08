@@ -1,4 +1,4 @@
-﻿from datetime import datetime
+﻿from app.core.time import utc_now_naive
 
 from fastapi import APIRouter, Depends, Header, HTTPException
 from fastapi.responses import JSONResponse
@@ -79,7 +79,7 @@ def list_watches(
         db.scalars(
             select(FlightWatch)
             .where(FlightWatch.user_id == current_user.id)
-            .order_by(FlightWatch.created_at.desc())
+            .order_by(FlightWatch.created_at.desc(), FlightWatch.id.desc())
         )
     )
     return [
@@ -133,7 +133,7 @@ def refresh_watch(
     for flight in flights:
         snapshot = PriceSnapshot(
             watch_id=watch.id,
-            captured_at_utc=datetime.utcnow(),
+            captured_at_utc=utc_now_naive(),
             departure_time_local=flight.departure_time_local,
             raw_price=flight.price,
             raw_currency=flight.currency,

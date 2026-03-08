@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import argparse
-from datetime import datetime, timedelta
+from datetime import timedelta
+
+from app.core.time import utc_now_naive
 
 from sqlalchemy import delete, select
 
@@ -10,7 +12,7 @@ from app.infrastructure.db.session import SessionLocal
 
 
 def prune_table(session, model, ts_column, retention_days: int, batch_size: int) -> int:
-    cutoff = datetime.utcnow() - timedelta(days=retention_days)
+    cutoff = utc_now_naive() - timedelta(days=retention_days)
     total_deleted = 0
 
     while True:

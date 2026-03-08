@@ -1,4 +1,6 @@
-﻿from datetime import date, datetime, timedelta
+﻿from datetime import date, timedelta
+
+from app.core.time import utc_now_naive
 
 from fastapi.testclient import TestClient
 
@@ -14,7 +16,7 @@ class _FakeProvider:
                 price=44.0,
                 currency="EUR",
                 departure_time_local="09:15",
-                captured_at=datetime.utcnow(),
+                captured_at=utc_now_naive(),
                 source="fake-provider",
             )
         ]

@@ -1,4 +1,6 @@
 ﻿from datetime import datetime
+
+from app.core.time import utc_now_naive
 from uuid import uuid4
 
 from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Numeric, String, Text, UniqueConstraint
@@ -17,7 +19,7 @@ class User(Base):
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
     locale: Mapped[str] = mapped_column(String(8), default="es")
     timezone: Mapped[str] = mapped_column(String(64), default="Europe/Madrid")
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
 
     watches: Mapped[list["FlightWatch"]] = relationship(back_populates="user")
     notes: Mapped[list["UserNote"]] = relationship(back_populates="user")
@@ -34,7 +36,7 @@ class FlightWatch(Base):
     target_price: Mapped[float | None] = mapped_column(Numeric(10, 2), nullable=True)
     status: Mapped[str] = mapped_column(String(20), default="active")
     is_paused: Mapped[bool] = mapped_column(Boolean, default=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
 
     user: Mapped[User] = relationship(back_populates="watches")
     snapshots: Mapped[list["PriceSnapshot"]] = relationship(back_populates="watch")
@@ -45,7 +47,7 @@ class PriceSnapshot(Base):
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
     watch_id: Mapped[str] = mapped_column(ForeignKey("flight_watch.id"), index=True)
-    captured_at_utc: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    captured_at_utc: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
     departure_time_local: Mapped[str | None] = mapped_column(String(5), nullable=True)
     raw_price: Mapped[float] = mapped_column(Numeric(10, 2))
     raw_currency: Mapped[str] = mapped_column(String(3), default="EUR")
@@ -75,7 +77,7 @@ class NotificationEvent(Base):
     channel: Mapped[str] = mapped_column(String(20), default="in_app")
     delivery_status: Mapped[str] = mapped_column(String(20), default="queued")
     message: Mapped[str] = mapped_column(Text)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
 
 
 class UserPreference(Base):
@@ -98,8 +100,8 @@ class UserProfile(Base):
     display_name: Mapped[str] = mapped_column(String(120), default="")
     avatar_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     status: Mapped[str] = mapped_column(String(32), default="activa")
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive, onupdate=utc_now_naive)
 
 
 class UserSession(Base):
@@ -109,8 +111,8 @@ class UserSession(Base):
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
     device: Mapped[str] = mapped_column(String(200), default="Este dispositivo")
     ip: Mapped[str | None] = mapped_column(String(45), nullable=True)
-    last_seen: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    last_seen: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
 
@@ -144,7 +146,7 @@ class SecurityActivity(Base):
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
     event_type: Mapped[str] = mapped_column(String(40))
     ip: Mapped[str | None] = mapped_column(String(45), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
 
 
 class SupportFeedback(Base):
@@ -155,7 +157,7 @@ class SupportFeedback(Base):
     feedback_type: Mapped[str] = mapped_column(String(20))
     message: Mapped[str] = mapped_column(Text)
     attachment_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
 
 
 class Suggestion(Base):
@@ -165,7 +167,7 @@ class Suggestion(Base):
     user_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     text: Mapped[str] = mapped_column(Text)
     locale: Mapped[str] = mapped_column(String(8), default="es")
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
 
 
 class IdempotencyRecord(Base):
@@ -181,7 +183,7 @@ class IdempotencyRecord(Base):
     request_hash: Mapped[str] = mapped_column(String(64))
     response_status: Mapped[int] = mapped_column()
     response_body: Mapped[str] = mapped_column(Text)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
 
 
 class UserNote(Base):
@@ -191,7 +193,7 @@ class UserNote(Base):
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
     title: Mapped[str] = mapped_column(String(120), default="")
     body: Mapped[str] = mapped_column(Text, default="")
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive, onupdate=utc_now_naive)
 
     user: Mapped[User] = relationship(back_populates="notes")
