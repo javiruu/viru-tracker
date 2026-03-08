@@ -16,6 +16,7 @@ from app.infrastructure.db.models import (
     SecurityActivity,
     SupportFeedback,
     Suggestion,
+    IdempotencyRecord,
     User,
     UserNote,
     UserPreference,
@@ -68,11 +69,12 @@ def update_profile(
         profile.display_name = payload.display_name.strip()
     if payload.avatar_url is not None:
         profile.avatar_url = payload.avatar_url.strip() or None
-    if payload.email and payload.email.strip().lower() != current_user.email:
-        existing = db.scalar(select(User).where(User.email == payload.email.lower()))
+    normalized_email = payload.email.strip().lower() if payload.email else None
+    if normalized_email and normalized_email != current_user.email.lower():
+        existing = db.scalar(select(User).where(User.email == normalized_email))
         if existing:
             raise HTTPException(status_code=409, detail="email_exists")
-        current_user.email = payload.email.lower()
+        current_user.email = normalized_email
     db.commit()
     return {
         "display_name": profile.display_name,
@@ -182,6 +184,7 @@ def delete_account(
     db.execute(delete(UserSession).where(UserSession.user_id == current_user.id))
     db.execute(delete(SecurityActivity).where(SecurityActivity.user_id == current_user.id))
     db.execute(delete(SupportFeedback).where(SupportFeedback.user_id == current_user.id))
+    db.execute(delete(IdempotencyRecord).where(IdempotencyRecord.user_id == current_user.id))
     db.execute(delete(User).where(User.id == current_user.id))
     db.commit()
     return {"status": "ok"}
