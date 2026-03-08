@@ -7,7 +7,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
+from starlette.status import HTTP_422_UNPROCESSABLE_CONTENT
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.errors import ApiError, error_envelope, message_for_code
@@ -112,12 +112,12 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         )
     )
     envelope = error_envelope(
-        status=HTTP_422_UNPROCESSABLE_ENTITY,
+        status=HTTP_422_UNPROCESSABLE_CONTENT,
         code="validation_error",
         message=message_for_code("validation_error"),
         details=safe_errors,
     )
-    return JSONResponse(status_code=HTTP_422_UNPROCESSABLE_ENTITY, content=envelope)
+    return JSONResponse(status_code=HTTP_422_UNPROCESSABLE_CONTENT, content=envelope)
 
 
 @app.exception_handler(HTTPException)

@@ -1,0 +1,51 @@
+﻿from datetime import date, datetime, timedelta
+
+from fastapi.testclient import TestClient
+
+import app.api.v1.watchlist as watchlist_api
+from app.domain.entities import ProviderFlight
+from tests.helpers import register_and_token
+
+
+class _FakeProvider:
+    def get_flights(self, origin: str, destination: str, travel_date: str) -> list[ProviderFlight]:
+        return [
+            ProviderFlight(
+                price=44.0,
+                currency="EUR",
+                departure_time_local="09:15",
+                captured_at=datetime.utcnow(),
+                source="fake-provider",
+            )
+        ]
+
+
+def test_watchlist_create_list_and_refresh(client: TestClient, monkeypatch) -> None:
+    monkeypatch.setattr(watchlist_api, "provider", _FakeProvider())
+
+    token = register_and_token(client)
+    headers = {"Authorization": f"Bearer {token}"}
+
+    create = client.post(
+        "/api/v1/watchlist",
+        headers=headers,
+        json={
+            "origin_iata": "MAD",
+            "destination_iata": "DUB",
+            "travel_date_local": str(date.today() + timedelta(days=30)),
+            "target_price": 40,
+        },
+    )
+    assert create.status_code == 200
+    watch_id = create.json()["id"]
+
+    listing = client.get("/api/v1/watchlist", headers=headers)
+    assert listing.status_code == 200
+    assert len(listing.json()) == 1
+
+    refresh = client.post(f"/api/v1/watchlist/{watch_id}/refresh-now", headers=headers)
+    assert refresh.status_code == 200
+
+    history = client.get(f"/api/v1/prices/history?watch_id={watch_id}", headers=headers)
+    assert history.status_code == 200
+    assert len(history.json()) >= 1

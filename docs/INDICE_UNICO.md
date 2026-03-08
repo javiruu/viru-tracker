@@ -1,6 +1,6 @@
 ﻿# INDICE_UNICO de Documentación
 
-Última actualización: 2026-03-07
+Última actualización: 2026-03-08
 
 ## Planes activos
 - `docs/plans/2026-02-18-fusion-watchlist-historico-plan.md` — Plan de implementación del panel unificado de seguimiento.
@@ -17,6 +17,12 @@
 - `docs/qa/traceability-matrix.md` — Trazabilidad de requisitos y pruebas.
 - `docs/qa/SKILLSPRITE_USER_CAPABILITIES.md` — Capacidades funcionales del usuario.
 - `docs/checks/c1-smoke.md` — Smoke manual para C1.
+- `docs/qa/2026-03-08-c6-qa-consolidated-report.md` — Consolidado QA de C6 por flujo crítico + smoke operativo.
+- `docs/qa/2026-03-08-c6-open-issues.md` — Issues abiertos clasificados (blocking/important/post-release).
+- `docs/qa/2026-03-08-c6-command-outputs.md` — Salidas reales de build/tests/smoke.
+- `docs/qa/2026-03-08-c6-docs-index.md` — Índice vivo de documentación alineada con implementación.
+- `docs/qa/2026-03-08-c6-checklist-cb1-cd2.md` — Checklist final C-B1..C-D2.
+- `docs/qa/2026-03-08-c6-readiness-acta.md` — Acta final de readiness (GO/NO-GO + riesgos).
 
 ## ADR
 - `docs/adr/ADR-001-monolito-modular.md`
@@ -31,6 +37,9 @@
 ## Guías generales
 - `docs/estetica.md`
 - `docs/feature-flags.md`
+
+## Changelog
+- `docs/changelog/2026-03-08-c1-c6-consolidated.md` — Cambios consolidados de C1 a C6.
 
 ## Convención de mantenimiento
 - Todo documento nuevo debe quedar enlazado aquí.
