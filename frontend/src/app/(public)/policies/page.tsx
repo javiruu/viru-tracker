@@ -61,7 +61,7 @@ export default function PoliciesPage() {
   }, [observerIds]);
 
   return (
-    <main className="shell policies-shell" id="main-content">
+    <main className="shell policies-shell cycle4-page policies-page" id="main-content">
       <header className="policies-hero" id="policies-top">
         <div className="policies-hero-header">
           <Link href="/" className="btn-ghost">Atrás</Link>
@@ -83,6 +83,10 @@ export default function PoliciesPage() {
           </div>
         </div>
       </header>
+
+      <div className="notice notice-info policies-context-note" role="status" aria-live="polite">
+        Esta política resume el estado operativo actual y se actualiza cuando cambian procesos relevantes.
+      </div>
 
       <section id="resumen-ejecutivo" className="policies-tldr">
         <div className="policies-tldr-header">

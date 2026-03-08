@@ -52,8 +52,10 @@ export default function SuggestionsPage() {
     }
   }
 
+  const stateTone = status === "success" ? "success" : status === "error" ? "error" : status === "sending" ? "loading" : "idle";
+
   return (
-    <main className="shell" id="main-content">
+    <main className="shell cycle4-page suggestions-page" id="main-content">
       <div className="page-header">
         <button className="btn-ghost" type="button" onClick={() => router.push("/dashboard")}>
           {t("admin.back")}
@@ -93,7 +95,7 @@ export default function SuggestionsPage() {
               <span>{text.length}/{MAX_LEN}</span>
             </div>
           </label>
-          <div className="row-actions">
+          <div className="row-actions suggestions-actions">
             <button className="btn-primary" type="submit" disabled={status === "sending"}>
               {status === "sending" ? t("suggestions.sending") : t("suggestions.send")}
             </button>
@@ -101,6 +103,9 @@ export default function SuggestionsPage() {
               {t("suggestions.reportIssue")}
             </Link>
             <span className="panel-note">{t("suggestions.moderationNote")}</span>
+            <span className={`state-pill state-${stateTone}`} aria-live="polite">
+              {status === "sending" ? t("suggestions.sending") : status === "success" ? t("suggestions.sentTitle") : status === "error" ? t("suggestions.notSentTitle") : t("suggestions.counterAvailable")}
+            </span>
           </div>
         </form>
       </section>

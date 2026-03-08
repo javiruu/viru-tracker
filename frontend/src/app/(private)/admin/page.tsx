@@ -261,7 +261,7 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="shell" id="main-content">
+    <main className="shell cycle4-page admin-page" id="main-content">
       <div className="page-header">
         <button className="btn-ghost" type="button" onClick={() => router.push("/dashboard")}>
           {t("admin.back")}
@@ -294,15 +294,21 @@ export default function AdminPage() {
           <span className="panel-note">{t("admin.diagnosticsTag")}</span>
         </div>
         <div className="stack">
-          {qaChecks.map((check) => (
-            <article key={check.label} className="list-row">
-              <div>
-                <strong>{check.label}</strong>
-                <div className="panel-note">{check.detail}</div>
-              </div>
-              <span className={`status-badge ${check.ok ? "status-ok" : "status-down"}`}>{check.ok ? t("admin.checks.ok") : t("admin.checks.failed")}</span>
-            </article>
-          ))}
+          {qaChecks.length === 0 ? (
+            <div className="notice notice-info" role="status" aria-live="polite">
+              {t("admin.loading")}
+            </div>
+          ) : (
+            qaChecks.map((check) => (
+              <article key={check.label} className="list-row">
+                <div>
+                  <strong>{check.label}</strong>
+                  <div className="panel-note">{check.detail}</div>
+                </div>
+                <span className={`status-badge ${check.ok ? "status-ok" : "status-down"}`}>{check.ok ? t("admin.checks.ok") : t("admin.checks.failed")}</span>
+              </article>
+            ))
+          )}
         </div>
       </section>
 
