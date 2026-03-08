@@ -10,8 +10,10 @@ export const accountEs = {
     search: "Búsqueda",
     appearance: "Apariencia",
     region: "Idioma y región",
+    preferencesHub: "Abrir preferencias",
     help: "Centro de ayuda",
-    feedback: "Enviar feedback",
+    feedback: "Reportar problema",
+    suggestions: "Proponer mejora",
     admin: "Admin",
     logout: "Cerrar sesión",
     hints: {
@@ -105,8 +107,10 @@ export const accountEn = {
     search: "Search",
     appearance: "Appearance",
     region: "Language & region",
+    preferencesHub: "Open preferences",
     help: "Help center",
-    feedback: "Send feedback",
+    feedback: "Report an issue",
+    suggestions: "Suggest an improvement",
     admin: "Admin",
     logout: "Sign out",
     hints: {

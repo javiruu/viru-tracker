@@ -28,6 +28,6 @@ test("resolvePostAuthUrl uses safe fallback", () => {
 
 test("route bridges map legacy paths", () => {
   assert.equal(resolveBridgeRoute("/history"), "/watchlist");
-  assert.equal(resolveBridgeRoute("/preferences"), "/preferencias/busqueda");
+  assert.equal(resolveBridgeRoute("/preferences"), "/preferencias");
   assert.equal(resolveBridgeRoute("/dashboard"), "/dashboard");
 });
