@@ -1,0 +1,11 @@
+[Unit]
+Description=Run Viru DB retention daily
+
+[Timer]
+OnCalendar=*-*-* 02:20:00
+RandomizedDelaySec=15m
+Persistent=true
+Unit=db-retention.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,25 @@
+[Unit]
+Description=Viru backend database retention job
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=viru
+Group=viru
+WorkingDirectory=/opt/viru-tracker/backend
+EnvironmentFile=-/etc/viru/backend.env
+ExecStart=/opt/viru-tracker/backend/ops/db-retention/run-db-retention.sh
+# Sane defaults; override via EnvironmentFile if needed
+Environment=DB_RETENTION_LOG_DIR=/opt/viru-tracker/backend/logs
+Environment=DB_RETENTION_PYTHON=/opt/viru-tracker/backend/.venv/bin/python
+
+# Hardening
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/opt/viru-tracker/backend/logs /opt/viru-tracker/backend
+
+[Install]
+WantedBy=multi-user.target
