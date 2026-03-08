@@ -1,0 +1,148 @@
+export type SearchResult = {
+  result_id?: string | null;
+  origin: string;
+  destination: string;
+  travel_date: string;
+  departure_time_local: string | null;
+  price: number;
+  price_total?: number;
+  currency: string;
+  source: string;
+  duration_total?: number | null;
+  duration_total_min?: number | null;
+  stop_count?: number | null;
+  risk_label?: string | null;
+  minutes_buffer?: number | null;
+  distance_km_ground?: number | null;
+  ranking_score?: number | null;
+  freshness_ts?: string | null;
+  stale_data?: boolean;
+  deeplink_url?: string | null;
+  itinerary_type?: string | null;
+  legs?: Array<{
+    origin_iata: string;
+    destination_iata: string;
+    dep_ts: string;
+    arr_ts: string;
+    flight_num?: string | null;
+    price?: number | null;
+  }>;
+  segments?: {
+    legs?: Array<{
+      origin_iata: string;
+      destination_iata: string;
+      dep_ts: string;
+      arr_ts: string;
+      flight_num?: string | null;
+      price?: number | null;
+    }>;
+  };
+};
+
+export type SearchFilters = {
+  applied?: Record<string, unknown>;
+  relaxed?: string[];
+  warnings?: string[];
+  discarded?: number;
+};
+
+export type SearchResponse = {
+  job_id?: string;
+  meta?: {
+    query?: Record<string, unknown>;
+    generated_at?: string;
+    currency?: string;
+    timezone?: string;
+    stale_data?: boolean;
+    freshness_ts?: string | null;
+    total_candidates?: number;
+    returned?: number;
+    truncated?: boolean;
+    warnings?: Array<{ code: string; message: string }>;
+  };
+  results: SearchResult[];
+  filters?: SearchFilters;
+};
+
+export type DeepLinkResponse = {
+  status: string;
+  url: string;
+  fallback_url?: string;
+  strategy?: string;
+};
+
+export type WeatherDay = {
+  date: string;
+  tempMax: number;
+  tempMin: number;
+  precipProb: number | null;
+  description: string;
+};
+
+export type WeatherReport = {
+  iata: string;
+  name: string;
+  city: string;
+  country: string;
+  days: WeatherDay[];
+};
+
+export type Pref = {
+  default_radius_km: number;
+  include_stops_default: boolean;
+  avoid_departure_before: string | null;
+  preferred_currency: string;
+  language: string;
+};
+
+export type RegionPref = {
+  language: string;
+  region: string;
+  time_format: string;
+  decimal_separator: string;
+  currency: string;
+};
+
+export type QuickSearchField = "origin_iata" | "destination_iata" | "travel_date";
+export type QuickSearchFieldErrors = Partial<Record<QuickSearchField, string>>;
+export type QuickSearchAutocompleteField = "origin" | "destination";
+export type QuickSearchMode = "quick-search" | "recommendations";
+export type QuickSearchTagTone = "low" | "med" | "high" | "fresh" | "stale";
+export type QuickSearchExplainTag = { key: string; label: string; tone: QuickSearchTagTone };
+export type QuickSearchTripType = "one_way" | "round_trip" | "round_trip_incomplete";
+export type QuickSearchLoadingPhase = "idle" | "requesting" | "response_parsed" | "client_done" | "committed";
+export type QuickSearchLoadingSubcheckStatus = "pending" | "active" | "done";
+export type ZeroResultRelaxAction = "disable_strict" | "increase_duration" | "open_radius_150" | "clear_exclusions";
+export type SummaryHighlightKey = "strict" | "duration" | "radius" | "exclusions" | null;
+
+export type RelaxUndoPayload =
+  | { action: "disable_strict"; strictFilters: boolean }
+  | { action: "increase_duration"; durationMax: string }
+  | {
+      action: "open_radius_150";
+      includeNearbyOrigins: boolean;
+      includeNearbyDestinations: boolean;
+      radiusKm: number;
+    }
+  | {
+      action: "clear_exclusions";
+      excludeOrigins: string[];
+      excludeDestinations: string[];
+      excludeOriginInput: string;
+      excludeDestinationInput: string;
+    };
+
+export type AirportIataEntry = {
+  iata: string;
+  name: string;
+  municipality: string;
+  country_code: string;
+  iso_region: string;
+  type: string;
+};
+
+export type CountryAirports = {
+  code: string;
+  name: string;
+  airports: AirportIataEntry[];
+};
