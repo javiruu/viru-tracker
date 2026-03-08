@@ -14,8 +14,8 @@ import { QuickSearchLoadingProgress } from "@/modules/quick-search/components/Qu
 import { QuickSearchResultsList } from "@/modules/quick-search/components/QuickSearchResultsList";
 import { QuickSearchSearchForm } from "@/modules/quick-search/components/QuickSearchSearchForm";
 import { QuickSearchStatePanels } from "@/modules/quick-search/components/QuickSearchStatePanels";
-import { normalizeQuickSearchResults } from "@/modules/quick-search/responseNormalizer";
-import { toQuickSearchQuery } from "@/modules/quick-search/requestBuilder";
+import { normalizeQuickSearchResults } from "@/modules/quick-search/api/normalizeQuickSearchResponse";
+import { toQuickSearchQuery } from "@/modules/quick-search/api/buildQuickSearchRequest";
 import {
   AirportIataEntry,
   CountryAirports,
@@ -38,7 +38,7 @@ import {
   SummaryHighlightKey,
   ZeroResultRelaxAction,
 } from "@/modules/quick-search/types";
-import { useQuickSearchMainState } from "@/modules/quick-search/useQuickSearchMainState";
+import { useQuickSearchMainState } from "@/modules/quick-search/state/useQuickSearchController";
 import airportsIata from "@/data/airports_iata.min.json";
 
 const RELAX_HIGHLIGHT_BY_ACTION: Record<ZeroResultRelaxAction, Exclude<SummaryHighlightKey, null>> = {
@@ -3182,7 +3182,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
           </div>
           <div className="qs-filter-actions">
             <button type="button" className="btn-ghost qs-reset-all" onClick={clearAllFilters} disabled={activeChips.length === 0}>
-              Reset todo
+              {t("resetAll")}
             </button>
             <button type="button" className="btn-ghost" onClick={applyPreferences} disabled={!pref}>
               {t("resetPrefs")}
@@ -3349,7 +3349,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
             <div className="qs-active-chips">
               <span className="muted">{t("toolbarActiveFilters")}</span>
               <button type="button" className="btn-ghost qs-reset-all-inline" onClick={clearAllFilters}>
-                Reset todo
+                {t("resetAll")}
               </button>
               {activeChips.map((chip) => (
                 <button key={chip.id} type="button" className="qs-chip" onClick={chip.onClear}>
