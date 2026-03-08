@@ -1,15 +1,17 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { FormEvent, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { useI18n } from "@/i18n";
 import { apiFetch } from "@/modules/shared/api";
 
 const MAX_LEN = 1000;
 
 export default function SuggestionsPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const [text, setText] = useState("");
   const [locale, setLocale] = useState("es");
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
@@ -17,21 +19,21 @@ export default function SuggestionsPage() {
 
   const remaining = MAX_LEN - text.length;
   const counterLabel = useMemo(() => {
-    if (remaining < 0) return "Excede el maximo";
-    if (remaining < 80) return "Limite cercano";
-    return "Disponible";
-  }, [remaining]);
+    if (remaining < 0) return t("suggestions.counterExceeded");
+    if (remaining < 80) return t("suggestions.counterNear");
+    return t("suggestions.counterAvailable");
+  }, [remaining, t]);
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     if (text.trim().length < 3) {
       setStatus("error");
-      setMessage("Describe la sugerencia con mas detalle.");
+      setMessage(t("suggestions.validationDetail"));
       return;
     }
     if (text.length > MAX_LEN) {
       setStatus("error");
-      setMessage("La sugerencia supera el limite.");
+      setMessage(t("suggestions.validationLimit"));
       return;
     }
     try {
@@ -42,11 +44,11 @@ export default function SuggestionsPage() {
         body: JSON.stringify({ text: text.trim(), locale }),
       });
       setStatus("success");
-      setMessage("Sugerencia enviada. Gracias por ayudar a mejorar Viru.");
+      setMessage(t("suggestions.sentMessage"));
       setText("");
     } catch (error) {
       setStatus("error");
-      setMessage(error instanceof Error ? error.message : "No se pudo enviar.");
+      setMessage(error instanceof Error ? error.message : t("suggestions.genericError"));
     }
   }
 
@@ -54,35 +56,35 @@ export default function SuggestionsPage() {
     <main className="shell" id="main-content">
       <div className="page-header">
         <button className="btn-ghost" type="button" onClick={() => router.push("/dashboard")}>
-          Atrás
+          {t("admin.back")}
         </button>
         <div className="page-title">
-          <h1>Sugerencias de producto</h1>
-          <p>Canal para ideas y mejoras de UX. Para bugs usa “Reportar problema”.</p>
+          <h1>{t("suggestions.title")}</h1>
+          <p>{t("suggestions.subtitle")}</p>
         </div>
       </div>
       <section className="panel panel-soft stack">
         <div>
-          <h2 className="panel-title">Feedback y mejoras</h2>
-          <p className="panel-subtitle">Cuéntanos rutas, bugs o mejoras de UX.</p>
+          <h2 className="panel-title">{t("suggestions.sectionTitle")}</h2>
+          <p className="panel-subtitle">{t("suggestions.sectionSubtitle")}</p>
         </div>
         <form className="suggestion-form" onSubmit={onSubmit}>
           <label className="field">
-            Idioma
+            {t("suggestions.localeLabel")}
             <select name="locale" autoComplete="language" value={locale} onChange={(e) => setLocale(e.target.value)}>
               <option value="es">Español</option>
               <option value="en">English</option>
             </select>
           </label>
           <label className="field">
-            Tu sugerencia
+            {t("suggestions.suggestionLabel")}
             <textarea
               name="suggestion"
               autoComplete="off"
               value={text}
               onChange={(e) => setText(e.target.value)}
               rows={6}
-              placeholder="Ejemplo: incluir aviso de precio orientativo en resultados."
+              placeholder={t("suggestions.placeholder")}
             />
             <div className="char-counter">
               <span className={`counter-chip ${remaining < 0 ? "danger" : remaining < 80 ? "warn" : ""}`}>
@@ -93,23 +95,22 @@ export default function SuggestionsPage() {
           </label>
           <div className="row-actions">
             <button className="btn-primary" type="submit" disabled={status === "sending"}>
-              {status === "sending" ? "Enviando" : "Enviar sugerencia"}
+              {status === "sending" ? t("suggestions.sending") : t("suggestions.send")}
             </button>
             <Link href="/soporte/feedback?type=bug" className="btn-ghost btn-compact">
-              Reportar problema
+              {t("suggestions.reportIssue")}
             </Link>
-            <span className="panel-note">Moderamos para evitar spam. Tu mensaje queda registrado.</span>
+            <span className="panel-note">{t("suggestions.moderationNote")}</span>
           </div>
         </form>
       </section>
 
       {message ? (
         <div className={`toast ${status === "success" ? "notice-success" : "notice-error"}`} role="status" aria-live="polite">
-          <strong>{status === "success" ? "Enviado" : "No enviado"}</strong>
+          <strong>{status === "success" ? t("suggestions.sentTitle") : t("suggestions.notSentTitle")}</strong>
           <span>{message}</span>
         </div>
       ) : null}
     </main>
   );
 }
-
