@@ -92,6 +92,16 @@ class SnapshotBatchIn(BaseModel):
         max_length=500,
         description="Lista de watch_ids (max 500) para recuperar histórico en lote",
     )
+    captured_since_utc: datetime | None = Field(
+        default=None,
+        description="Filtra snapshots capturados desde este timestamp UTC (inclusive)",
+    )
+    max_rows: int = Field(
+        default=5000,
+        ge=1,
+        le=20000,
+        description="Límite duro de filas a devolver en la respuesta batch",
+    )
 
 
 class SnapshotBatchOut(BaseModel):

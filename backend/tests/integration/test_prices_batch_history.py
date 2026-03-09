@@ -42,6 +42,7 @@ def _create_watch(client: TestClient, headers: dict[str, str], origin: str, dest
 
 def test_batch_history_empty_watch_ids_returns_empty(client: TestClient, monkeypatch) -> None:
     monkeypatch.setattr(watchlist_api, "provider", _FakeProvider())
+    monkeypatch.setattr(watchlist_api, "REFRESH_COOLDOWN_SECONDS", 0)
 
     token = register_and_token(client, email="batch-empty@viru.dev")
     headers = {"Authorization": f"Bearer {token}"}
@@ -53,6 +54,7 @@ def test_batch_history_empty_watch_ids_returns_empty(client: TestClient, monkeyp
 
 def test_batch_history_mixed_watch_ids_returns_only_owned(client: TestClient, monkeypatch) -> None:
     monkeypatch.setattr(watchlist_api, "provider", _FakeProvider())
+    monkeypatch.setattr(watchlist_api, "REFRESH_COOLDOWN_SECONDS", 0)
 
     token_owner = register_and_token(client, email="batch-owner@viru.dev")
     token_other = register_and_token(client, email="batch-other@viru.dev")
@@ -83,6 +85,7 @@ def test_batch_history_mixed_watch_ids_returns_only_owned(client: TestClient, mo
 
 def test_batch_history_duplicate_watch_ids_do_not_duplicate_rows(client: TestClient, monkeypatch) -> None:
     monkeypatch.setattr(watchlist_api, "provider", _FakeProvider())
+    monkeypatch.setattr(watchlist_api, "REFRESH_COOLDOWN_SECONDS", 0)
 
     token = register_and_token(client, email="batch-dup@viru.dev")
     headers = {"Authorization": f"Bearer {token}"}
@@ -124,3 +127,51 @@ def test_batch_history_invalid_payload_returns_422(client: TestClient) -> None:
         json={"watch_ids": too_many_ids},
     )
     assert response.status_code == 422
+
+
+def test_batch_history_rejects_payload_too_large_response(client: TestClient, monkeypatch) -> None:
+    monkeypatch.setattr(watchlist_api, "provider", _FakeProvider())
+    monkeypatch.setattr(watchlist_api, "REFRESH_COOLDOWN_SECONDS", 0)
+
+    token = register_and_token(client, email="batch-too-large@viru.dev")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    watch_one = _create_watch(client, headers, "MAD", "DUB", 35)
+    watch_two = _create_watch(client, headers, "MAD", "BLQ", 36)
+
+    assert client.post(f"/api/v1/watchlist/{watch_one}/refresh-now", headers=headers).status_code == 200
+    assert client.post(f"/api/v1/watchlist/{watch_two}/refresh-now", headers=headers).status_code == 200
+
+    response = client.post(
+        "/api/v1/prices/history/batch",
+        headers=headers,
+        json={"watch_ids": [watch_one, watch_two], "max_rows": 1},
+    )
+    assert response.status_code == 413
+
+
+def test_batch_history_can_filter_by_captured_since(client: TestClient, monkeypatch) -> None:
+    monkeypatch.setattr(watchlist_api, "provider", _FakeProvider())
+    monkeypatch.setattr(watchlist_api, "REFRESH_COOLDOWN_SECONDS", 0)
+
+    token = register_and_token(client, email="batch-since@viru.dev")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    watch_id = _create_watch(client, headers, "AGP", "TSF", 37)
+    assert client.post(f"/api/v1/watchlist/{watch_id}/refresh-now", headers=headers).status_code == 200
+
+    without_filter = client.post(
+        "/api/v1/prices/history/batch",
+        headers=headers,
+        json={"watch_ids": [watch_id]},
+    )
+    assert without_filter.status_code == 200
+    assert len(without_filter.json()) >= 1
+
+    with_future_filter = client.post(
+        "/api/v1/prices/history/batch",
+        headers=headers,
+        json={"watch_ids": [watch_id], "captured_since_utc": "2999-01-01T00:00:00"},
+    )
+    assert with_future_filter.status_code == 200
+    assert with_future_filter.json() == []

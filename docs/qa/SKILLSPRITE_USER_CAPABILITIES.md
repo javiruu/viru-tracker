@@ -124,7 +124,7 @@ Este documento enumera todo lo que puede hacer un usuario en Viru Tracker, separ
 ## API de capacidades (resumen operativo)
 - Auth: `POST /api/v1/auth/register`, `POST /api/v1/auth/login`, `GET /api/v1/auth/me`
 - Watchlist: `POST /api/v1/watchlist`, `GET /api/v1/watchlist`, `POST /api/v1/watchlist/{watch_id}/refresh-now`
-- Prices: `GET /api/v1/prices/history`, `POST /api/v1/prices/history/batch` (hasta 500 watch_ids)
+- Prices: `GET /api/v1/prices/history`, `POST /api/v1/prices/history/batch` (hasta 500 watch_ids, `max_rows` 1..20000, `captured_since_utc` opcional)
 - Search: `POST /api/v1/search/quick`, `GET /api/v1/search/deeplink`
 - Alerts: `POST /api/v1/alerts/rules`, `GET /api/v1/alerts/rules`, `PUT /api/v1/alerts/rules/{rule_id}`, `DELETE /api/v1/alerts/rules/{rule_id}`, `POST /api/v1/alerts/evaluate`, `GET /api/v1/alerts/events`
 - Preferences: `GET /api/v1/preferences`, `PUT /api/v1/preferences`

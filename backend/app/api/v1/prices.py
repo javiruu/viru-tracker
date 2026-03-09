@@ -1,5 +1,5 @@
-﻿from fastapi import APIRouter, Depends
-from sqlalchemy import select
+﻿from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
@@ -50,22 +50,34 @@ def history_batch(
     if not watch_ids:
         return []
 
+    deduped_watch_ids = list(dict.fromkeys(watch_ids))
+
     allowed_watch_ids = set(
         db.scalars(
             select(FlightWatch.id).where(
                 FlightWatch.user_id == current_user.id,
-                FlightWatch.id.in_(watch_ids),
+                FlightWatch.id.in_(deduped_watch_ids),
             )
         )
     )
     if not allowed_watch_ids:
         return []
 
+    count_stmt = select(func.count(PriceSnapshot.id)).where(PriceSnapshot.watch_id.in_(allowed_watch_ids))
+    if payload.captured_since_utc is not None:
+        count_stmt = count_stmt.where(PriceSnapshot.captured_at_utc >= payload.captured_since_utc)
+
+    total_rows = int(db.scalar(count_stmt) or 0)
+    if total_rows > payload.max_rows:
+        raise HTTPException(status_code=413, detail="batch_history_too_large")
+
+    rows_stmt = select(PriceSnapshot).where(PriceSnapshot.watch_id.in_(allowed_watch_ids))
+    if payload.captured_since_utc is not None:
+        rows_stmt = rows_stmt.where(PriceSnapshot.captured_at_utc >= payload.captured_since_utc)
+
     rows = list(
         db.scalars(
-            select(PriceSnapshot)
-            .where(PriceSnapshot.watch_id.in_(allowed_watch_ids))
-            .order_by(
+            rows_stmt.order_by(
                 PriceSnapshot.watch_id.asc(),
                 PriceSnapshot.captured_at_utc.desc(),
                 PriceSnapshot.id.desc(),
