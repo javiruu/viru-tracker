@@ -35,6 +35,19 @@ type QaCheck = {
   detail: string;
 };
 
+type ProductMetrics = {
+  dashboard_views: number;
+  quick_search_executed: number;
+  search_empty_results: number;
+  search_empty_rate_pct: number;
+  quick_search_avg_ms: number;
+  watchlist_refresh: number;
+  alert_created: number;
+  alert_triggered: number;
+  watchlist_refresh_to_alert_created_pct: number;
+  alert_created_rate_pct: number;
+};
+
 export default function AdminPage() {
   const router = useRouter();
   const { t, localeTag } = useI18n();
@@ -52,6 +65,7 @@ export default function AdminPage() {
   const [systemStatus, setSystemStatus] = useState<SystemStatus>("ok");
   const [updatedAt, setUpdatedAt] = useState("");
   const [qaChecks, setQaChecks] = useState<QaCheck[]>([]);
+  const [metrics, setMetrics] = useState<ProductMetrics | null>(null);
 
   const statusMeta = useMemo(() => {
     if (systemStatus === "ok") return { label: t("admin.status.ok"), detail: t("admin.status.okDetail") };
@@ -64,6 +78,7 @@ export default function AdminPage() {
       apiFetch<Me>("/auth/me"),
       apiFetch<AdminUser[]>("/admin/users"),
       apiFetch<Watch[]>("/watchlist"),
+      apiFetch<ProductMetrics>("/admin/product-metrics"),
     ]);
 
     const nextChecks: QaCheck[] = [
@@ -95,6 +110,10 @@ export default function AdminPage() {
     ];
 
     setQaChecks(nextChecks);
+
+    if (checks[3].status === "fulfilled") {
+      setMetrics(checks[3].value);
+    }
 
     const failures = nextChecks.filter((item) => !item.ok).length;
     if (failures === 0) {
@@ -310,6 +329,28 @@ export default function AdminPage() {
             ))
           )}
         </div>
+      </section>
+
+      <section className="panel panel-soft section-gap">
+        <div className="panel-header">
+          <h2 className="panel-title">{t("admin.metricsTitle")}</h2>
+          <span className="panel-note">{t("admin.metricsSubtitle")}</span>
+        </div>
+        {!metrics ? (
+          <div className="notice notice-info" role="status" aria-live="polite">{t("admin.loading")}</div>
+        ) : (
+          <div className="dashboard-primary-grid">
+            <article className="module-card"><strong>{t("admin.metricsQuickSearches")}</strong><span>{metrics.quick_search_executed}</span></article>
+            <article className="module-card"><strong>{t("admin.metricsEmptyRate")}</strong><span>{metrics.search_empty_rate_pct}%</span></article>
+            <article className="module-card"><strong>{t("admin.metricsAlertsCreated")}</strong><span>{metrics.alert_created}</span></article>
+            <article className="module-card"><strong>{t("admin.metricsAlertsTriggered")}</strong><span>{metrics.alert_triggered}</span></article>
+            <article className="module-card"><strong>{t("admin.metricsWatchRefreshes")}</strong><span>{metrics.watchlist_refresh}</span></article>
+            <article className="module-card"><strong>{t("admin.metricsDashboardViews")}</strong><span>{metrics.dashboard_views}</span></article>
+            <article className="module-card"><strong>{t("admin.metricsAvgSearchMs")}</strong><span>{metrics.quick_search_avg_ms}</span></article>
+            <article className="module-card"><strong>{t("admin.metricsRefreshToAlertRate")}</strong><span>{metrics.watchlist_refresh_to_alert_created_pct}%</span></article>
+            <article className="module-card"><strong>{t("admin.metricsAlertCreateRate")}</strong><span>{metrics.alert_created_rate_pct}%</span></article>
+          </div>
+        )}
       </section>
 
       <section className="split section-gap">

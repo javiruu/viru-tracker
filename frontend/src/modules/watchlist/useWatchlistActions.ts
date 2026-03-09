@@ -1,5 +1,6 @@
 ﻿import { FormEvent, useEffect, useState } from "react";
 
+import { trackUxEvent } from "@/lib/uxTracking";
 import { apiFetch } from "@/modules/shared/api";
 import { COUNTRY_AIRPORTS, CountryAirports, findCountryByIata } from "@/modules/shared/airports";
 import { toIsoMonth } from "@/modules/watchlist/dateUtils";
@@ -218,6 +219,7 @@ export function useWatchlistActions({
     setRefreshingWatchId(id);
     try {
       await apiFetch<{ status: string }>(`/watchlist/${id}/refresh-now`, { method: "POST" });
+      void trackUxEvent("watchlist_refresh", { scope: "single" });
       await load();
       setMessage("Refresh lanzado");
       setMessageType("success");
@@ -250,6 +252,7 @@ export function useWatchlistActions({
       await Promise.allSettled(
         targets.map((item) => apiFetch<{ status: string }>(`/watchlist/${item.id}/refresh-now`, { method: "POST" })),
       );
+      void trackUxEvent("watchlist_refresh", { scope: "filtered", count: targets.length });
       await load();
       setMessage("Refresh ejecutado para los vuelos filtrados.");
       setMessageType("success");

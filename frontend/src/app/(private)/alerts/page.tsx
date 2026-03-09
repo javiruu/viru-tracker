@@ -3,6 +3,7 @@
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { trackUxEvent } from "@/lib/uxTracking";
 import { apiFetch } from "@/modules/shared/api";
 import { formatCurrency } from "@/modules/shared/format";
 import { useI18n } from "@/i18n";
@@ -175,6 +176,7 @@ export default function AlertsPage() {
       ]);
       setRules(updatedRules);
       setEvents(updatedEvents);
+      void trackUxEvent("alert_created", { rule_type: ruleType });
       setStatus("success");
       setMessage(t("alerts.messages.ruleCreated"));
       setThresholdValue("");
@@ -230,8 +232,13 @@ export default function AlertsPage() {
         method: "POST",
         body: JSON.stringify({ watch_id: selectedWatchId }),
       });
+      const previousEventCount = events.length;
       const updatedEvents = await apiFetch<AlertEvent[]>(`/alerts/events?watch_id=${selectedWatchId}&limit=50`);
       setEvents(updatedEvents);
+      const triggeredCount = Math.max(0, updatedEvents.length - previousEventCount);
+      if (triggeredCount > 0) {
+        void trackUxEvent("alert_triggered", { count: triggeredCount });
+      }
       setMessage(t("alerts.messages.evaluationComplete"));
       setStatus("success");
     } catch {

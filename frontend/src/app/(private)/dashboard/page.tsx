@@ -3,9 +3,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
+import { useI18n } from "@/i18n";
+import { trackUxEvent } from "@/lib/uxTracking";
 import { apiFetch } from "@/modules/shared/api";
 import { trackEvent } from "@/modules/shared/analytics";
-import { useI18n } from "@/i18n";
 
 type Me = { id: string; email: string; locale: string; is_admin: boolean };
 type Watch = { id: string; origin_iata: string; destination_iata: string; status: string };
@@ -33,6 +34,10 @@ export default function DashboardPage() {
   const [watches, setWatches] = useState<Watch[]>([]);
   const [notes, setNotes] = useState<Note[]>([]);
   const [backendBanner, setBackendBanner] = useState<BackendBanner | null>(null);
+
+  useEffect(() => {
+    void trackUxEvent("dashboard_view");
+  }, []);
   const [noteDraft, setNoteDraft] = useState({ title: "", body: "" });
   const [noteActiveId, setNoteActiveId] = useState<string | null>(null);
   const [noteStatus, setNoteStatus] = useState<string | null>(null);

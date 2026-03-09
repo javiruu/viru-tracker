@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { apiFetch, apiFetchWithStatus } from "@/modules/shared/api";
 import { getAirportMeta } from "@/modules/shared/airports";
 import { getQuickSearchCopy } from "@/modules/shared/quickSearchCopy";
+import { trackUxEvent } from "@/lib/uxTracking";
 import { trackEvent } from "@/modules/shared/analytics";
 import { formatCurrency, formatNumber } from "@/modules/shared/format";
 import { buildDateRange } from "@/modules/quick-search/utils";
@@ -993,6 +994,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
+    const startedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
     requestIdRef.current += 1;
     const requestId = requestIdRef.current;
     activeLoadingRequestRef.current = requestId;
@@ -1137,7 +1139,13 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
           }
           setProgress("client_done", 95);
           setHasSearched(true);
-          setSearchState(data.results.length === 0 ? "empty" : "success");
+          const isEmptyResult = data.results.length === 0;
+          setSearchState(isEmptyResult ? "empty" : "success");
+          const durationMs = Math.round((typeof performance !== "undefined" ? performance.now() : Date.now()) - startedAt);
+          void trackUxEvent("quick_search_executed", { duration_ms: durationMs, result_count: data.results.length });
+          if (isEmptyResult) {
+            void trackUxEvent("search_empty_results", { duration_ms: durationMs });
+          }
         } else {
           const { status, error } = searchResult;
           const validationErrors = parseValidationErrors(error.details);

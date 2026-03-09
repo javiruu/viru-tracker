@@ -55,6 +55,25 @@ class AdminPasswordIn(BaseModel):
     password: str = Field(min_length=8)
 
 
+class UxEventIn(BaseModel):
+    event_name: str = Field(min_length=1, max_length=64)
+    duration_ms: int | None = Field(default=None, ge=0, le=300000)
+    metadata: dict[str, str | int | float | bool | None] = Field(default_factory=dict)
+
+
+class AdminProductMetricsOut(BaseModel):
+    dashboard_views: int
+    quick_search_executed: int
+    search_empty_results: int
+    search_empty_rate_pct: float
+    quick_search_avg_ms: float
+    watchlist_refresh: int
+    alert_created: int
+    alert_triggered: int
+    watchlist_refresh_to_alert_created_pct: float
+    alert_created_rate_pct: float
+
+
 class WatchCreateIn(BaseModel):
     origin_iata: str = Field(min_length=3, max_length=3)
     destination_iata: str = Field(min_length=3, max_length=3)
