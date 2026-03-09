@@ -1,5 +1,7 @@
 # UI Contract v1 (Viru Tracker)
 
+> Referencia de freeze oficial: `docs/UI_SYSTEM_V1.md`
+
 ## Objetivo
 Establecer reglas mínimas para mantener consistencia visual y reducir regresiones en la interfaz.
 

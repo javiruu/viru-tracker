@@ -48,14 +48,6 @@
   gap: 1rem;
 }
 
-.panel-header {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-panel-header-gap);
-  align-items: center;
-  margin-bottom: var(--space-panel-header-gap);
-}
-
 .panel-header h2 {
   margin: 0;
   font-family: "Playfair Display", serif;
