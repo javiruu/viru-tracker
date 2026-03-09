@@ -65,7 +65,11 @@ def history_batch(
         db.scalars(
             select(PriceSnapshot)
             .where(PriceSnapshot.watch_id.in_(allowed_watch_ids))
-            .order_by(PriceSnapshot.captured_at_utc.desc(), PriceSnapshot.id.desc())
+            .order_by(
+                PriceSnapshot.watch_id.asc(),
+                PriceSnapshot.captured_at_utc.desc(),
+                PriceSnapshot.id.desc(),
+            )
         )
     )
     return [

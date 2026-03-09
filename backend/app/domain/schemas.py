@@ -87,7 +87,11 @@ class SnapshotOut(BaseModel):
 
 
 class SnapshotBatchIn(BaseModel):
-    watch_ids: list[str] = Field(default_factory=list, max_length=500)
+    watch_ids: list[str] = Field(
+        default_factory=list,
+        max_length=500,
+        description="Lista de watch_ids (max 500) para recuperar histórico en lote",
+    )
 
 
 class SnapshotBatchOut(BaseModel):
