@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { FormEvent, useCallback, useEffect, useMemo } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
 import { apiFetch, apiFetchWithStatus } from "@/modules/shared/api";
@@ -11,11 +12,23 @@ import { trackUxEvent } from "@/lib/uxTracking";
 import { trackEvent } from "@/modules/shared/analytics";
 import { formatCurrency, formatNumber } from "@/modules/shared/format";
 import { buildDateRange } from "@/modules/quick-search/utils";
-import { QuickSearchAdvancedFilters } from "@/modules/quick-search/components/QuickSearchAdvancedFilters";
-import { QuickSearchLoadingProgress } from "@/modules/quick-search/components/QuickSearchLoadingProgress";
-import { QuickSearchResultsList } from "@/modules/quick-search/components/QuickSearchResultsList";
-import { QuickSearchSearchForm } from "@/modules/quick-search/components/QuickSearchSearchForm";
-import { QuickSearchStatePanels } from "@/modules/quick-search/components/QuickSearchStatePanels";
+const QuickSearchAdvancedFilters = dynamic(() =>
+  import("@/modules/quick-search/components/QuickSearchAdvancedFilters").then((m) => m.QuickSearchAdvancedFilters),
+);
+const QuickSearchLoadingProgress = dynamic(() =>
+  import("@/modules/quick-search/components/QuickSearchLoadingProgress").then((m) => m.QuickSearchLoadingProgress),
+  { ssr: false },
+);
+const QuickSearchResultsList = dynamic(() =>
+  import("@/modules/quick-search/components/QuickSearchResultsList").then((m) => m.QuickSearchResultsList),
+  { ssr: false },
+);
+const QuickSearchSearchForm = dynamic(() =>
+  import("@/modules/quick-search/components/QuickSearchSearchForm").then((m) => m.QuickSearchSearchForm),
+);
+const QuickSearchStatePanels = dynamic(() =>
+  import("@/modules/quick-search/components/QuickSearchStatePanels").then((m) => m.QuickSearchStatePanels),
+);
 import { normalizeQuickSearchResults } from "@/modules/quick-search/api/normalizeQuickSearchResponse";
 import { toQuickSearchQuery } from "@/modules/quick-search/api/buildQuickSearchRequest";
 import {

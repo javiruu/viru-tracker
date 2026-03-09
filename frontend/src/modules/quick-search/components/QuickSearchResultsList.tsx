@@ -1,4 +1,4 @@
-import type React from "react";
+import React, { memo } from "react";
 
 import { SearchResult } from "@/modules/quick-search/types";
 
@@ -39,7 +39,7 @@ type Props = {
   onTrackCopyParams: (rowId: string) => void;
 };
 
-export function QuickSearchResultsList(props: Props) {
+function QuickSearchResultsListInner(props: Props) {
   return (
     <>
       {props.visibleResults.length > 0 ? (
@@ -254,3 +254,5 @@ export function QuickSearchResultsList(props: Props) {
     </>
   );
 }
+
+export const QuickSearchResultsList = memo(QuickSearchResultsListInner);
