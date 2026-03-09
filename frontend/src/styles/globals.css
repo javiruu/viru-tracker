@@ -2912,14 +2912,26 @@ h1 {
 }
 
 .watch-meta {
-  display: grid;
-  gap: 0.2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
   font-size: 0.84rem;
   color: var(--ink-muted);
 }
 
+.watch-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.16rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 86%, var(--surface-2));
+}
+
 .watch-note {
   color: var(--ink-muted);
+  width: 100%;
 }
 
 .watch-price {
@@ -2984,8 +2996,15 @@ h1 {
 
 .watch-row {
   cursor: pointer;
-  border-radius: 12px;
-  padding: 0.55rem 0.5rem;
+  border-radius: 14px;
+  padding: 0.72rem 0.66rem;
+  border: 1px solid transparent;
+  transition: border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
+}
+
+.watch-row:hover {
+  border-color: color-mix(in srgb, var(--accent-2) 30%, var(--border));
+  background: color-mix(in srgb, var(--surface) 86%, var(--surface-2));
 }
 
 .watch-row:focus-visible {
@@ -3276,6 +3295,18 @@ h1 {
   display: flex;
   gap: 0.4rem;
   flex-wrap: wrap;
+}
+
+.compare-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(46, 110, 98, 0.35);
+  background: rgba(46, 110, 98, 0.1);
+  color: var(--text-primary);
+  font-size: 0.74rem;
+  font-weight: 600;
 }
 
 .compare-badge {
