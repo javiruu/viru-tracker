@@ -428,7 +428,12 @@ export default function AlertsPage() {
 
       <section className="panel panel-soft stack section-gap">
         <div className="row-between">
-          <h2 className="panel-title">{t("alerts.history.title")}</h2>
+          <div>
+            <h2 className="panel-title">{t("alerts.history.title")}</h2>
+            <p className="panel-note">
+              Última evaluación de alertas: {events[0]?.created_at ? formatRelativeTime(events[0].created_at) : "sin datos"}
+            </p>
+          </div>
           <span className="panel-note">{t("alerts.history.count", { count: events.length })}</span>
         </div>
         {events.length === 0 ? (

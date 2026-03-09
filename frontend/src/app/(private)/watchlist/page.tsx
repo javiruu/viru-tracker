@@ -62,6 +62,12 @@ export default function WatchlistPage() {
         </section>
       ) : null}
 
+      {derived.lastUpdatedGlobal ? (
+        <div className="notice notice-info section-gap" role="status" aria-live="polite">
+          Última actualización: {derived.lastUpdatedGlobal}
+        </div>
+      ) : null}
+
       {actions.message ? (
         <div
           className={`notice section-gap ${actions.messageType === "success" ? "notice-success" : "notice-error"}`}
