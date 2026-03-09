@@ -86,6 +86,18 @@ class SnapshotOut(BaseModel):
     departure_time_local: str | None = None
 
 
+class SnapshotBatchIn(BaseModel):
+    watch_ids: list[str] = Field(default_factory=list, max_length=500)
+
+
+class SnapshotBatchOut(BaseModel):
+    watch_id: str
+    captured_at_utc: datetime
+    raw_price: float
+    raw_currency: str
+    departure_time_local: str | None = None
+
+
 RULE_TYPE_ALIASES = {
     "threshold_below": "threshold_low",
     "threshold_above": "threshold_high",

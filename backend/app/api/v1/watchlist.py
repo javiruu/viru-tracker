@@ -1,4 +1,7 @@
-﻿from app.core.time import utc_now_naive
+﻿import os
+from datetime import timedelta
+
+from app.core.time import utc_now_naive
 
 from fastapi import APIRouter, Depends, Header, HTTPException
 from fastapi.responses import JSONResponse
@@ -15,6 +18,7 @@ from app.infrastructure.providers.ryanair_public_provider import RyanairPublicPr
 
 router = APIRouter()
 provider = RyanairPublicProvider()
+REFRESH_COOLDOWN_SECONDS = max(0, int(os.getenv("WATCH_REFRESH_COOLDOWN_SECONDS", "60")))
 
 
 @router.post("", response_model=WatchOut)
@@ -122,6 +126,18 @@ def refresh_watch(
     )
     if not watch:
         raise HTTPException(status_code=404, detail="watch_not_found")
+
+    if REFRESH_COOLDOWN_SECONDS > 0:
+        latest_snapshot = db.scalar(
+            select(PriceSnapshot)
+            .where(PriceSnapshot.watch_id == watch.id)
+            .order_by(PriceSnapshot.captured_at_utc.desc(), PriceSnapshot.id.desc())
+        )
+        if latest_snapshot:
+            earliest_next_refresh = latest_snapshot.captured_at_utc + timedelta(seconds=REFRESH_COOLDOWN_SECONDS)
+            if earliest_next_refresh > utc_now_naive():
+                raise HTTPException(status_code=429, detail="refresh_cooldown_active")
+
     try:
         flights = provider.get_flights(
             watch.origin_iata, watch.destination_iata, str(watch.travel_date_local)
