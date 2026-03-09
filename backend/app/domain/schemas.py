@@ -61,6 +61,12 @@ class UxEventIn(BaseModel):
     metadata: dict[str, str | int | float | bool | None] = Field(default_factory=dict)
 
 
+class ClientErrorIn(BaseModel):
+    section: str = Field(min_length=1, max_length=64)
+    message: str = Field(min_length=1, max_length=500)
+    stack: str | None = Field(default=None, max_length=8000)
+
+
 class AdminProductMetricsOut(BaseModel):
     dashboard_views: int
     quick_search_executed: int

@@ -2,15 +2,18 @@ from __future__ import annotations
 
 import json
 
+import logging
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
-from app.domain.schemas import UxEventIn
+from app.domain.schemas import ClientErrorIn, UxEventIn
 from app.infrastructure.db.models import User, UxEvent
 from app.infrastructure.db.session import get_db
 
 router = APIRouter()
+logger = logging.getLogger("app.ux")
 
 ALLOWED_EVENTS = {
     "dashboard_view",
@@ -41,3 +44,18 @@ def create_ux_event(
     db.add(event)
     db.commit()
     return {"status": "ok"}
+
+
+@router.post("/errors")
+def create_client_error(
+    payload: ClientErrorIn,
+    current_user: User = Depends(get_current_user),
+) -> dict[str, str]:
+    logger.error(
+        "client_error section=%s user_id=%s message=%s stack=%s",
+        payload.section,
+        current_user.id,
+        payload.message,
+        payload.stack or "",
+    )
+    return {"status": "logged"}
