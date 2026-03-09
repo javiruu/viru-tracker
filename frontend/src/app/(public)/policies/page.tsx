@@ -10,19 +10,19 @@ type TocItem = {
 
 const tocItems: TocItem[] = [
   { id: "resumen-ejecutivo", label: "Resumen ejecutivo" },
-  { id: "indice-navegable", label: "Indice navegable" },
+  { id: "indice-navegable", label: "Índice navegable" },
   { id: "uso-responsable", label: "Uso responsable" },
-  { id: "alcance-limites", label: "Alcance del servicio y limites" },
+  { id: "alcance-límites", label: "Alcance del servicio y límites" },
   { id: "datos-proveedor", label: "Datos de proveedor y calidad del dato" },
-  { id: "alertas-recomendaciones", label: "Alertas, recomendaciones y predicciones" },
-  { id: "privacidad", label: "Privacidad y proteccion de datos" },
-  { id: "conservacion", label: "Conservacion, borrado y portabilidad" },
-  { id: "seguridad-cuenta", label: "Seguridad de cuenta y sesiones" },
-  { id: "cookies-telemetria", label: "Cookies, analitica y telemetria" },
-  { id: "politicas-pais", label: "Consejos y politicas por pais" },
+  { id: "alertas-recomendaciones", label: "Alertas, recomendaciones y predicciónes" },
+  { id: "privacidad", label: "Privacidad y protección de datos" },
+  { id: "conservación", label: "Conservación, borrado y portabilidad" },
+  { id: "seguridad-cuenta", label: "Seguridad de cuenta y sesiónes" },
+  { id: "cookies-telemetría", label: "Cookies, analítica y telemetría" },
+  { id: "políticas-país", label: "Consejos y políticas por país" },
   { id: "deeplink-terceros", label: "Redireccion a Ryanair y terceros" },
-  { id: "no-asesoramiento", label: "Exencion de responsabilidad" },
-  { id: "cambios-politica", label: "Cambios de politica y versiones" },
+  { id: "no-asesoramiento", label: "Exención de responsabilidad" },
+  { id: "cambios-política", label: "Cambios de política y versiónes" },
   { id: "contacto-legal", label: "Contacto legal y privacidad" },
   { id: "derechos-simple", label: "Tus derechos, en simple" },
   { id: "faq", label: "FAQ" },
@@ -70,13 +70,13 @@ export default function PoliciesPage() {
           </div>
         </div>
         <div className="policies-hero-copy">
-          <h1>Politicas y Transparencia</h1>
+          <h1>Políticas y Transparencia</h1>
           <p>
-            En Viru priorizamos la claridad, el control del usuario y limites honestos sobre lo que podemos y
+            En Viru priorizamos la claridad, el control del usuario y límites honestos sobre lo que podemos y
             no podemos garantizar.
           </p>
           <div className="policies-meta">
-            <span><strong>Ultima actualizacion:</strong> 17 Feb 2026</span>
+            <span><strong>Ultima actualización:</strong> 17 Feb 2026</span>
             <span><strong>Version:</strong> 1.0</span>
             <span><strong>Idioma:</strong> ES</span>
             <span><strong>Tiempo de lectura:</strong> 12 min</span>
@@ -97,20 +97,20 @@ export default function PoliciesPage() {
           <span className="badge badge-transparency">Transparencia</span>
         </div>
         <ul>
-          <li>Viru es una herramienta informativa de seguimiento, no una garantia de precio final.</li>
+          <li>Viru es una herramienta informativa de seguimiento, no una garantía de precio final.</li>
           <li>Las fuentes externas pueden fallar o cambiar sin aviso; mostramos el ultimo dato confirmado.</li>
           <li>Guardamos datos necesarios para operar tu watchlist, alertas y preferencias.</li>
           <li>Las alertas y recomendaciones son orientativas, nunca asesoramiento financiero.</li>
-          <li>Puedes solicitar eliminacion, portabilidad y acceso desde tu cuenta o soporte.</li>
+          <li>Puedes solicitar eliminación, portabilidad y acceso desde tu cuenta o soporte.</li>
           <li>No compartimos credenciales ni tokens con terceros.</li>
           <li>En modo degradado reducimos consultas y marcamos frescura de forma visible.</li>
-          <li>El contenido de politicas se revisa periodicamente y refleja el estado operativo documentado.</li>
+          <li>El contenido de políticas se revisa periodicamente y refleja el estado operativo documentado.</li>
         </ul>
       </section>
 
       <section id="indice-navegable" className="policies-index">
         <div className="policies-index-header">
-          <h2>Indice navegable</h2>
+          <h2>Índice navegable</h2>
           <button
             type="button"
             className="btn-ghost policies-index-toggle"
@@ -121,7 +121,7 @@ export default function PoliciesPage() {
             {isIndexOpen ? "Cerrar indice" : "Abrir indice"}
           </button>
         </div>
-        <nav id="policies-toc" className={`policies-toc ${isIndexOpen ? "open" : ""}`} aria-label="Indice de politicas">
+        <nav id="policies-toc" className={`policies-toc ${isIndexOpen ? "open" : ""}`} aria-label="Índice de políticas">
           {tocItems.map((item) => (
             <a
               key={item.id}
@@ -152,10 +152,10 @@ export default function PoliciesPage() {
             </p>
           </section>
 
-          <section id="alcance-limites" className="policies-section">
+          <section id="alcance-límites" className="policies-section">
             <div className="policies-section-header">
-              <h2>Alcance del servicio y limites</h2>
-              <span className="badge badge-limitation">Limitacion</span>
+              <h2>Alcance del servicio y límites</h2>
+              <span className="badge badge-limitation">Limitación</span>
             </div>
             <p>
               Viru cubre seguimiento, comparativas y alertas sobre precios observados. No procesa pagos ni
@@ -163,7 +163,7 @@ export default function PoliciesPage() {
             </p>
             <p>
               En modo degradado reducimos llamadas a proveedores y priorizamos estabilidad. En ese estado veras
-              etiquetas de frescura y posibles retrasos en actualizaciones.
+              etiquetas de frescura y posibles retrasos en actualizaciónes.
             </p>
           </section>
 
@@ -174,7 +174,7 @@ export default function PoliciesPage() {
             </div>
             <p>
               Las fuentes externas pueden cambiar, fallar o responder con variaciones. Diferenciamos entre dato
-              observado, dato estimado y prediccion:
+              observado, dato estimado y predicción:
             </p>
             <ul className="policies-list">
               <li><strong>Observado:</strong> precio recibido directamente del proveedor.</li>
@@ -189,7 +189,7 @@ export default function PoliciesPage() {
 
           <section id="alertas-recomendaciones" className="policies-section">
             <div className="policies-section-header">
-              <h2>Alertas, recomendaciones y predicciones</h2>
+              <h2>Alertas, recomendaciones y predicciónes</h2>
               <span className="badge badge-control">Tu control</span>
             </div>
             <p>
@@ -204,7 +204,7 @@ export default function PoliciesPage() {
 
           <section id="privacidad" className="policies-section">
             <div className="policies-section-header">
-              <h2>Privacidad y proteccion de datos</h2>
+              <h2>Privacidad y protección de datos</h2>
               <span className="badge badge-important">Importante</span>
             </div>
             <p>
@@ -212,19 +212,19 @@ export default function PoliciesPage() {
               idioma y ajustes de interfaz. No compartimos credenciales ni tokens con terceros.
             </p>
             <p>
-              Registramos eventos tecnicos para calidad y seguridad: intentos de acceso, errores de proveedor,
+              Registramos eventos técnicos para calidad y seguridad: intentos de acceso, errores de proveedor,
               tiempos de respuesta y acciones criticas (por ejemplo, crear una alerta o cambiar preferencias).
               Nunca usamos estos eventos para perfilado publicitario.
             </p>
           </section>
 
-          <section id="conservacion" className="policies-section">
+          <section id="conservación" className="policies-section">
             <div className="policies-section-header">
-              <h2>Conservacion, borrado y portabilidad</h2>
+              <h2>Conservación, borrado y portabilidad</h2>
               <span className="badge badge-control">Tu control</span>
             </div>
             <p>
-              Puedes solicitar eliminacion de datos desde tu cuenta o escribiendo a soporte. La portabilidad
+              Puedes solicitar eliminación de datos desde tu cuenta o escribiendo a soporte. La portabilidad
               aplica a datos que has generado: watchlists, alertas y preferencias.
             </p>
             <div className="policies-table">
@@ -258,26 +258,26 @@ export default function PoliciesPage() {
 
           <section id="seguridad-cuenta" className="policies-section">
             <div className="policies-section-header">
-              <h2>Seguridad de cuenta y sesiones</h2>
+              <h2>Seguridad de cuenta y sesiónes</h2>
               <span className="badge badge-important">Importante</span>
             </div>
             <p>
-              Mantienes el control total de tus sesiones. Si detectas actividad sospechosa, cierra sesion desde
+              Mantienes el control total de tus sesiónes. Si detectas actividad sospechosa, cierra sesión desde
               el panel y cambia tu password. No compartas credenciales ni tokens con terceros.
             </p>
             <p>
-              Usamos sesiones con expiración y controles de invalidación de acceso. Si un dispositivo queda inactivo,
+              Usamos sesiónes con expiración y controles de invalidación de acceso. Si un dispositivo queda inactivo,
               la sesión puede invalidarse para reducir riesgo.
             </p>
           </section>
 
-          <section id="cookies-telemetria" className="policies-section">
+          <section id="cookies-telemetría" className="policies-section">
             <div className="policies-section-header">
-              <h2>Cookies, analitica y telemetria</h2>
+              <h2>Cookies, analítica y telemetría</h2>
               <span className="badge badge-transparency">Transparencia</span>
             </div>
             <p>
-              Usamos cookies estrictamente necesarias para mantener tu sesion y preferencias. La telemetria se
+              Usamos cookies estrictamente necesarias para mantener tu sesión y preferencias. La telemetría se
               limita a calidad de servicio: tiempos de respuesta, errores y rendimiento.
             </p>
             <p>
@@ -286,9 +286,9 @@ export default function PoliciesPage() {
             </p>
           </section>
 
-          <section id="politicas-pais" className="policies-section">
+          <section id="políticas-país" className="policies-section">
             <div className="policies-section-header">
-              <h2>Consejos y politicas por pais</h2>
+              <h2>Consejos y políticas por país</h2>
               <span className="badge badge-transparency">Transparencia</span>
             </div>
             <p>
@@ -296,19 +296,19 @@ export default function PoliciesPage() {
               Cuando haya cambios relevantes, se actualizan en esta política con fecha de revisión.
             </p>
             <p>
-              Esto permite i18n futuro sin reescribir la politica completa. Si tu pais requiere informacion
-              adicional, la veras en esta misma seccion.
+              Esto permite i18n futuro sin reescribir la política completa. Si tu país requiere informacion
+              adicional, la veras en esta misma sección.
             </p>
           </section>
 
           <section id="deeplink-terceros" className="policies-section">
             <div className="policies-section-header">
               <h2>Redireccion a Ryanair (deep-link) y terceros</h2>
-              <span className="badge badge-limitation">Limitacion</span>
+              <span className="badge badge-limitation">Limitación</span>
             </div>
             <p>
-              Viru genera deep-links para facilitar el acceso al proveedor. Al hacer click, sales de Viru y pasas
-              a un entorno de terceros, con sus propias condiciones y politicas.
+              Viru genera deep-links para facilitar el acceso al proveedor. Al hacer clic, sales de Viru y pasas
+              a un entorno de terceros, con sus propias condiciones y políticas.
             </p>
             <p>
               Si el deep-link falla, mostramos un enlace alternativo y avisamos. No controlamos cambios de precio
@@ -318,8 +318,8 @@ export default function PoliciesPage() {
 
           <section id="no-asesoramiento" className="policies-section">
             <div className="policies-section-header">
-              <h2>Exencion de responsabilidad y no asesoramiento financiero</h2>
-              <span className="badge badge-limitation">Limitacion</span>
+              <h2>Exención de responsabilidad y no asesoramiento financiero</h2>
+              <span className="badge badge-limitation">Limitación</span>
             </div>
             <p>
               Viru no ofrece asesoramiento financiero, legal ni fiscal. Las alertas y recomendaciones son guias
@@ -330,9 +330,9 @@ export default function PoliciesPage() {
             </p>
           </section>
 
-          <section id="cambios-politica" className="policies-section">
+          <section id="cambios-política" className="policies-section">
             <div className="policies-section-header">
-              <h2>Cambios de politica y control de versiones</h2>
+              <h2>Cambios de política y control de versiónes</h2>
               <span className="badge badge-transparency">Transparencia</span>
             </div>
             <p>
@@ -341,7 +341,7 @@ export default function PoliciesPage() {
             </p>
             <p>
               Puedes consultar el resumen de cambios en esta misma pagina y decidir si deseas continuar usando
-              Viru o solicitar la eliminacion de datos.
+              Viru o solicitar la eliminación de datos.
             </p>
           </section>
 
@@ -370,16 +370,16 @@ export default function PoliciesPage() {
                 <p>Puedes pedir copia de los datos que tenemos sobre tu cuenta y actividad.</p>
               </details>
               <details>
-                <summary>Rectificacion</summary>
+                <summary>Rectificación</summary>
                 <p>Si algo no es correcto, lo ajustamos tras verificar tu identidad.</p>
               </details>
               <details>
                 <summary>Eliminacion</summary>
-                <p>Solicita borrado total desde tu cuenta o via soporte.</p>
+                <p>Solicita borrado total desde tu cuenta o vía soporte.</p>
               </details>
               <details>
-                <summary>Limitacion u oposicion</summary>
-                <p>Reducimos el tratamiento de datos cuando existe un motivo legitimo.</p>
+                <summary>Limitación u oposicion</summary>
+                <p>Reducimos el tratamiento de datos cuando existe un motivo legítimo.</p>
               </details>
               <details>
                 <summary>Portabilidad</summary>
@@ -387,7 +387,7 @@ export default function PoliciesPage() {
               </details>
               <details>
                 <summary>Retirada de consentimiento</summary>
-                <p>Puedes cambiar ajustes de analitica o notificaciones en preferencias.</p>
+                <p>Puedes cambiar ajustes de analítica o notificaciones en preferencias.</p>
               </details>
             </div>
           </section>
@@ -419,7 +419,7 @@ export default function PoliciesPage() {
                 <p>No. Tus credenciales y tokens no se comparten con terceros.</p>
               </details>
               <details>
-                <summary>¿Las alertas son automaticas?</summary>
+                <summary>¿Las alertas son automáticas?</summary>
                 <p>Se activan segun tus reglas. Tu decides umbrales y condiciones.</p>
               </details>
               <details>
@@ -443,7 +443,7 @@ export default function PoliciesPage() {
                 <p>Depende de la configuración activa de tu entorno. Si está disponible, lo verás en preferencias.</p>
               </details>
               <details>
-                <summary>¿Como reporto un error en un dato?</summary>
+                <summary>¿Cómo reporto un error en un dato?</summary>
                 <p>Contacta soporte e indica ruta, fecha y captura si es posible.</p>
               </details>
             </div>
@@ -451,27 +451,27 @@ export default function PoliciesPage() {
 
           <section id="cta-final" className="policies-section policies-cta">
             <h2>Acciones finales</h2>
-            <p>Si necesitas volver al panel o gestionar privacidad, aqui tienes accesos directos.</p>
+            <p>Si necesitas volver al panel o gestionar privacidad, aquí tienes accesos directos.</p>
             <div className="policies-cta-actions">
               <Link href="/dashboard" className="btn-primary">Volver al panel</Link>
               <a href="mailto:soporte@viru.app" className="btn-ghost">Contactar soporte</a>
-              <a href="mailto:privacidad@viru.app" className="btn-ghost">Solicitar eliminacion de datos</a>
+              <a href="mailto:privacidad@viru.app" className="btn-ghost">Solicitar eliminación de datos</a>
             </div>
           </section>
         </div>
 
-        <aside className="policies-quick" aria-label="Resumen rapido">
+        <aside className="policies-quick" aria-label="Resumen rápido">
           <div className="policies-quick-card">
-            <h3>Resumen rapido</h3>
+            <h3>Resumen rápido</h3>
             <p className="muted">
-              Pensado para lectura rapida. Si necesitas detalle legal, consulta las secciones completas.
+              Pensado para lectura rapida. Si necesitas detalle legal, consulta las secciónes completas.
             </p>
             <ul>
-              <li>Herramienta informativa, sin garantia de precio.</li>
+              <li>Herramienta informativa, sin garantía de precio.</li>
               <li>Marca de frescura cuando falta proveedor.</li>
               <li>Alertas orientativas y configurables.</li>
               <li>Derecho a borrado y portabilidad.</li>
-              <li>Eventos tecnicos para seguridad.</li>
+              <li>Eventos técnicos para seguridad.</li>
             </ul>
           </div>
         </aside>
@@ -479,7 +479,7 @@ export default function PoliciesPage() {
 
       <div className="policies-floating">
         <a href="#policies-top" className="btn-ghost" aria-label="Subir al inicio">Subir</a>
-        <a href="#indice-navegable" className="btn-primary" aria-label="Ir al indice">Indice</a>
+        <a href="#indice-navegable" className="btn-primary" aria-label="Ir al indice">Índice</a>
       </div>
     </main>
   );

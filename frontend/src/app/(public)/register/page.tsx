@@ -17,6 +17,7 @@ function RegisterContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [fieldError, setFieldError] = useState<{ email?: string; password?: string }>({});
 
   const returnUrl = useMemo(() => {
     return resolvePostAuthUrl(searchParams.get("returnUrl"));
@@ -40,10 +41,23 @@ function RegisterContent() {
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     setError("");
+    const nextFieldError: { email?: string; password?: string } = {};
+    const normalizedEmail = email.trim();
+    if (!normalizedEmail.includes("@")) {
+      nextFieldError.email = t("public.auth.emailInvalid");
+    }
+    if (password.trim().length < 8) {
+      nextFieldError.password = t("public.auth.passwordMin");
+    }
+    if (Object.keys(nextFieldError).length > 0) {
+      setFieldError(nextFieldError);
+      return;
+    }
+    setFieldError({});
     try {
       const data = await apiFetch<AuthOut>("/auth/register", {
         method: "POST",
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: normalizedEmail, password }),
       });
       saveToken(data.access_token);
       router.push(returnUrl);
@@ -82,6 +96,7 @@ function RegisterContent() {
               type="email"
               placeholder="tu@email.com"
             />
+            {fieldError.email ? <small className="field-error">{fieldError.email}</small> : null}
           </label>
           <label>
             {t("public.auth.registerPassword")}
@@ -91,8 +106,9 @@ function RegisterContent() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               type="password"
-              placeholder={t("public.auth.registerPasswordHint")}
+              placeholder={t("public.auth.passwordPlaceholder")}
             />
+            {fieldError.password ? <small className="field-error">{fieldError.password}</small> : null}
           </label>
           {error ? (
             <div className="notice notice-error" role="status" aria-live="polite">
