@@ -21,17 +21,11 @@ def _index_names(conn, table_name: str) -> set[str]:
     return {idx["name"] for idx in insp.get_indexes(table_name)}
 
 
-def upgrade() -> None:
-    conn = op.get_bind()
-    insp = sa.inspect(conn)
-    tables = set(insp.get_table_names())
-    if "flight_watch" not in tables:
-        return
-
-    rows = conn.execute(
+def _dedupe_flight_watch(conn, tables: set[str]) -> None:
+    duplicates = conn.execute(
         sa.text(
             """
-            SELECT user_id, origin_iata, destination_iata, travel_date_local, MAX(created_at) AS keep_created_at
+            SELECT user_id, origin_iata, destination_iata, travel_date_local
             FROM flight_watch
             GROUP BY user_id, origin_iata, destination_iata, travel_date_local
             HAVING COUNT(*) > 1
@@ -39,30 +33,60 @@ def upgrade() -> None:
         )
     ).fetchall()
 
-    for row in rows:
-        conn.execute(
-            sa.text(
-                """
-                DELETE FROM flight_watch
-                WHERE id IN (
+    for row in duplicates:
+        watch_ids = [
+            item[0]
+            for item in conn.execute(
+                sa.text(
+                    """
                     SELECT id
                     FROM flight_watch
                     WHERE user_id = :user_id
                       AND origin_iata = :origin_iata
                       AND destination_iata = :destination_iata
                       AND travel_date_local = :travel_date_local
-                      AND created_at < :keep_created_at
+                    ORDER BY created_at DESC, id DESC
+                    """
+                ),
+                {
+                    "user_id": row.user_id,
+                    "origin_iata": row.origin_iata,
+                    "destination_iata": row.destination_iata,
+                    "travel_date_local": row.travel_date_local,
+                },
+            ).fetchall()
+        ]
+        if len(watch_ids) <= 1:
+            continue
+
+        keeper_id = watch_ids[0]
+        duplicate_ids = watch_ids[1:]
+
+        for duplicate_id in duplicate_ids:
+            if "price_snapshot" in tables:
+                conn.execute(
+                    sa.text("UPDATE price_snapshot SET watch_id = :keeper_id WHERE watch_id = :duplicate_id"),
+                    {"keeper_id": keeper_id, "duplicate_id": duplicate_id},
                 )
-                """
-            ),
-            {
-                "user_id": row.user_id,
-                "origin_iata": row.origin_iata,
-                "destination_iata": row.destination_iata,
-                "travel_date_local": row.travel_date_local,
-                "keep_created_at": row.keep_created_at,
-            },
-        )
+            if "alert_rule" in tables:
+                conn.execute(
+                    sa.text("UPDATE alert_rule SET watch_id = :keeper_id WHERE watch_id = :duplicate_id"),
+                    {"keeper_id": keeper_id, "duplicate_id": duplicate_id},
+                )
+            conn.execute(
+                sa.text("DELETE FROM flight_watch WHERE id = :duplicate_id"),
+                {"duplicate_id": duplicate_id},
+            )
+
+
+def upgrade() -> None:
+    conn = op.get_bind()
+    insp = sa.inspect(conn)
+    tables = set(insp.get_table_names())
+    if "flight_watch" not in tables:
+        return
+
+    _dedupe_flight_watch(conn, tables)
 
     existing = _index_names(conn, "flight_watch")
     if UNIQUE_NAME not in existing:

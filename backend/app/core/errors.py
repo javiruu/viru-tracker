@@ -37,6 +37,7 @@ ERROR_MESSAGES: dict[str, str] = {
     "validation_error": "Request validation failed.",
     "email_exists": "Email already registered.",
     "origin_equals_destination": "Origin and destination must be different.",
+    "watch_already_exists": "This watch already exists for the same route and date.",
     "watch_not_found": "Watch not found.",
     "rule_not_found": "Rule not found.",
     "not_allowed": "Operation is not allowed.",

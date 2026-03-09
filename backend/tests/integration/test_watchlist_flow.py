@@ -51,3 +51,24 @@ def test_watchlist_create_list_and_refresh(client: TestClient, monkeypatch) -> N
     history = client.get(f"/api/v1/prices/history?watch_id={watch_id}", headers=headers)
     assert history.status_code == 200
     assert len(history.json()) >= 1
+
+
+def test_watchlist_create_duplicate_returns_409(client: TestClient, monkeypatch) -> None:
+    monkeypatch.setattr(watchlist_api, "provider", _FakeProvider())
+
+    token = register_and_token(client, email="duplicate-watch@viru.dev")
+    headers = {"Authorization": f"Bearer {token}"}
+    payload = {
+        "origin_iata": "MAD",
+        "destination_iata": "DUB",
+        "travel_date_local": str(date.today() + timedelta(days=45)),
+        "target_price": 55,
+    }
+
+    first = client.post("/api/v1/watchlist", headers=headers, json=payload)
+    assert first.status_code == 200
+
+    duplicated = client.post("/api/v1/watchlist", headers=headers, json=payload)
+    assert duplicated.status_code == 409
+    body = duplicated.json()
+    assert body.get("code") == "watch_already_exists" or body.get("detail") == "watch_already_exists"

@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse
 from app.core.errors import error_envelope, message_for_code
 from app.core.idempotency import replay_if_exists, request_hash, store_response
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
@@ -47,17 +48,36 @@ def create_watch(
         response.headers["x-idempotency-replayed"] = "true"
         return response
 
-    if payload.origin_iata.upper() == payload.destination_iata.upper():
+    origin_iata = payload.origin_iata.upper()
+    destination_iata = payload.destination_iata.upper()
+
+    if origin_iata == destination_iata:
         raise HTTPException(status_code=400, detail="origin_equals_destination")
+
+    existing = db.scalar(
+        select(FlightWatch.id).where(
+            FlightWatch.user_id == current_user.id,
+            FlightWatch.origin_iata == origin_iata,
+            FlightWatch.destination_iata == destination_iata,
+            FlightWatch.travel_date_local == payload.travel_date_local,
+        )
+    )
+    if existing:
+        raise HTTPException(status_code=409, detail="watch_already_exists")
+
     watch = FlightWatch(
         user_id=current_user.id,
-        origin_iata=payload.origin_iata.upper(),
-        destination_iata=payload.destination_iata.upper(),
+        origin_iata=origin_iata,
+        destination_iata=destination_iata,
         travel_date_local=payload.travel_date_local,
         target_price=payload.target_price,
     )
     db.add(watch)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(status_code=409, detail="watch_already_exists") from exc
     db.refresh(watch)
     body = {
         "id": watch.id,
