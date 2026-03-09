@@ -2534,12 +2534,6 @@ h1 {
   gap: 1rem;
 }
 
-.row-actions {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
 .row-start {
   display: flex;
   align-items: center;
