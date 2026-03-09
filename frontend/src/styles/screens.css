@@ -1186,36 +1186,6 @@ h1 {
   box-shadow: 0 20px 50px var(--shadow);
 }
 
-.panel {
-  background: var(--panel-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 1rem;
-  box-shadow: 0 18px 36px var(--shadow);
-}
-
-.panel-soft {
-  background: var(--surface);
-  border-color: rgba(217, 205, 187, 0.7);
-  box-shadow: 0 14px 30px var(--shadow);
-}
-
-.panel-title {
-  margin: 0;
-  font-family: "Playfair Display", serif;
-  font-size: 1.15rem;
-}
-
-.panel-subtitle {
-  margin: 0.25rem 0 0;
-  color: var(--ink-muted);
-  font-size: 0.9rem;
-}
-
-.panel-note {
-  color: var(--ink-muted);
-  font-size: 0.88rem;
-}
 
 .qs-disclaimer {
   margin: 0 0 0.8rem;
@@ -2291,17 +2261,6 @@ h1 {
   gap: 1rem;
 }
 
-.section-gap {
-  margin-top: 1rem;
-}
-
-.section-gap-lg {
-  margin-top: 1.5rem;
-}
-
-.section-gap-sm {
-  margin-top: 0.5rem;
-}
 
 .form-spaced {
   margin-top: 1.5rem;
@@ -2527,12 +2486,6 @@ h1 {
   text-transform: capitalize;
 }
 
-.row-between {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-}
 
 .row-start {
   display: flex;
@@ -2817,15 +2770,6 @@ h1 {
   grid-template-columns: 1fr 1fr;
 }
 
-.page-header {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 1rem;
-  align-items: center;
-  margin-bottom: 1.1rem;
-  padding-bottom: 0.65rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
-}
 
 .watchlist-header {
   align-items: baseline;
@@ -2886,38 +2830,7 @@ h1 {
   font-weight: 600;
 }
 
-.panel-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  align-items: center;
-  margin-bottom: 0.75rem;
-}
 
-.panel-header h2 {
-  margin: 0;
-  font-family: "Playfair Display", serif;
-}
-
-.panel-actions {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.list-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 0.5rem;
-  gap: 1rem;
-  align-items: center;
-  padding: 0.35rem 0;
-  border-bottom: 1px dashed var(--border);
-}
-
-.list-row:last-child {
-  border-bottom: none;
-}
 
 .watch-row {
   display: grid;
@@ -6947,24 +6860,6 @@ textarea::placeholder {
   font-weight: 500;
 }
 
-.notice-compact {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding-block: 0.62rem;
-}
-
-.notice-compact p {
-  margin: 0.22rem 0 0;
-  font-size: 0.88rem;
-}
-
-.notice-actions {
-  display: inline-flex;
-  gap: 0.45rem;
-  flex-wrap: wrap;
-}
 
 .btn-compact {
   min-height: 40px;

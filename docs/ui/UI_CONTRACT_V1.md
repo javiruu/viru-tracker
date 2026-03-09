@@ -5,11 +5,14 @@ Establecer reglas mínimas para mantener consistencia visual y reducir regresion
 
 ## Naming y capas de estilos
 - `base.css`: fundamentos y reset.
-- `tokens.css`: variables de diseño (color, spacing, tipografía, foco).
-- `components.css`: componentes reutilizables.
+- `tokens.css`: variables de diseño (color, spacing, tipografía, foco, estados).
+- `components.css`: componentes y patrones reutilizables.
 - `screens.css`: ajustes específicos por pantalla.
 
-Regla: evitar estilos de pantalla en capas base/components.
+Reglas de ubicación:
+1. Si el patrón aparece en 2+ pantallas, debe vivir en `components.css`.
+2. Si es un valor semántico repetido (espacio, color, radio, tono), debe vivir en `tokens.css`.
+3. `screens.css` solo para layout/orden/alineación exclusivos de una ruta.
 
 ## Componente: Card
 Uso: contenedor visual para bloques de contenido.
