@@ -84,7 +84,7 @@ export const adminEs = {
     port: "Puerto",
     updated: "Actualizado",
     routes: "Rutas",
-    routesValue: "admin, watchlist, quick-search",
+    routesValue: "admin, seguimiento, búsqueda rápida",
   },
 };
 

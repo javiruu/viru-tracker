@@ -179,10 +179,9 @@ export default function AlertsPage() {
       setMessage(t("alerts.messages.ruleCreated"));
       setThresholdValue("");
       setNotifyEveryChange(false);
-    } catch (error) {
+    } catch {
       setStatus("error");
-      const fallback = t("alerts.messages.ruleCreateError");
-      setMessage(error instanceof Error ? error.message : fallback);
+      setMessage(t("alerts.messages.ruleCreateError"));
     }
   }
 

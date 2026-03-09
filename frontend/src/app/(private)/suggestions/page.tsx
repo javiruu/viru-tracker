@@ -46,9 +46,9 @@ export default function SuggestionsPage() {
       setStatus("success");
       setMessage(t("suggestions.sentMessage"));
       setText("");
-    } catch (error) {
+    } catch {
       setStatus("error");
-      setMessage(error instanceof Error ? error.message : t("suggestions.genericError"));
+      setMessage(t("suggestions.genericError"));
     }
   }
 

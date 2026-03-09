@@ -1151,10 +1151,10 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
           if (status === 429) {
             setRateLimitSeconds(error.retry_after_sec ?? 30);
             setSearchState("rate");
-            setSearchError(error.message || t("rateLimitText"));
+            setSearchError(t("rateLimitText"));
           } else {
             setSearchState("error");
-            setSearchError(Object.keys(validationErrors).length > 0 ? t("errorText") : (error.message || t("searchFailed")));
+            setSearchError(Object.keys(validationErrors).length > 0 ? t("errorText") : t("searchFailed"));
           }
           setHasSearched(true);
       }
@@ -1162,7 +1162,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
       if (!isCurrentRequest()) return;
       setProgress("client_done", 95);
       setSearchState("error");
-      setSearchError(error instanceof Error ? error.message : t("searchFailed"));
+      setSearchError(t("searchFailed"));
       setHasSearched(true);
     } finally {
       if (isCurrentRequest()) {
@@ -1239,7 +1239,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
         });
       }
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : t("watchFailed"));
+      setMessage(t("watchFailed"));
       setMessageType("error");
     }
   }
