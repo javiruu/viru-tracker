@@ -1,6 +1,11 @@
 /* Tokens layer (v1): centralized semantic state tokens */
 
 :root {
+  --dashboard-section-gap: 2.1rem;
+  --dashboard-block-gap: 1.15rem;
+  --dashboard-muted-size: 0.88rem;
+  --dashboard-muted-tone: var(--ink-muted);
+
   --state-success-bg: rgba(46, 110, 98, 0.12);
   --state-success-border: rgba(46, 110, 98, 0.4);
   --state-success-text: var(--ink);
