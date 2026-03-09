@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { apiFetch, apiFetchWithStatus } from "@/modules/shared/api";
 import { getAirportMeta } from "@/modules/shared/airports";
 import { getQuickSearchCopy } from "@/modules/shared/quickSearchCopy";
+import { useFtueHint } from "@/lib/ftue";
 import { trackUxEvent } from "@/lib/uxTracking";
 import { trackEvent } from "@/modules/shared/analytics";
 import { formatCurrency, formatNumber } from "@/modules/shared/format";
@@ -2342,6 +2343,8 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
     bufferMin,
   ]);
 
+  const quickSearchHint = useFtueHint("quick_search");
+
   const runSearch = () => {
     void onSubmit({ preventDefault: () => {} } as FormEvent);
   };
@@ -2357,6 +2360,20 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
           <p>{pageSubtitle}</p>
         </div>
       </div>
+
+      {quickSearchHint.visible ? (
+        <section className="notice notice-compact notice-info section-gap" role="status" aria-live="polite">
+          <div>
+            <strong>Primer vistazo</strong>
+            <p>Aquí puedes buscar vuelos rápidamente.</p>
+          </div>
+          <div className="notice-actions">
+            <button type="button" className="btn-ghost btn-compact" onClick={quickSearchHint.dismiss}>
+              Entendido
+            </button>
+          </div>
+        </section>
+      ) : null}
 
       <QuickSearchSearchForm formRef={formRef} isReady={isReady} routePulse={routePulse} onSubmit={onSubmit}>
         <div className="qs-route">

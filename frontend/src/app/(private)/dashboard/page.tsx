@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
 import { useI18n } from "@/i18n";
+import { useFtueHint } from "@/lib/ftue";
 import { trackUxEvent } from "@/lib/uxTracking";
 import { apiFetch } from "@/modules/shared/api";
 import { trackEvent } from "@/modules/shared/analytics";
@@ -34,6 +35,7 @@ export default function DashboardPage() {
   const [watches, setWatches] = useState<Watch[]>([]);
   const [notes, setNotes] = useState<Note[]>([]);
   const [backendBanner, setBackendBanner] = useState<BackendBanner | null>(null);
+  const dashboardHint = useFtueHint("dashboard");
 
   useEffect(() => {
     void trackUxEvent("dashboard_view");
@@ -283,6 +285,20 @@ export default function DashboardPage() {
           <span className="lang-pill">{locale}</span>
         </div>
       </section>
+
+      {dashboardHint.visible ? (
+        <section className="notice notice-compact notice-info section-gap" role="status" aria-live="polite">
+          <div>
+            <strong>Primer vistazo</strong>
+            <p>Aquí puedes ver un resumen de tu actividad y accesos rápidos.</p>
+          </div>
+          <div className="notice-actions">
+            <button type="button" className="btn-ghost btn-compact" onClick={dashboardHint.dismiss}>
+              Entendido
+            </button>
+          </div>
+        </section>
+      ) : null}
 
       {backendBanner ? (
         <section className={`notice notice-compact notice-${backendBanner.severity} section-gap`} role="status" aria-live="polite">
