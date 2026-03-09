@@ -91,6 +91,17 @@ class UxEvent(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive, index=True)
 
 
+class ClientErrorEvent(Base):
+    __tablename__ = "client_error_event"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    user_id: Mapped[str | None] = mapped_column(ForeignKey("users.id"), nullable=True, index=True)
+    section: Mapped[str] = mapped_column(String(64), index=True)
+    message: Mapped[str] = mapped_column(String(500))
+    stack: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive, index=True)
+
+
 class UserPreference(Base):
     __tablename__ = "user_preference"
 

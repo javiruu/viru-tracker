@@ -1,6 +1,8 @@
 ﻿from fastapi import APIRouter, Depends, HTTPException
 from passlib.context import CryptContext
-from sqlalchemy import delete, func, select
+from datetime import timedelta
+
+from sqlalchemy import delete, desc, func, select
 from sqlalchemy.orm import Session
 
 from app.api.deps import require_admin
@@ -18,6 +20,7 @@ from app.infrastructure.db.models import (
     NotificationEvent,
     PriceSnapshot,
     Suggestion,
+    ClientErrorEvent,
     User,
     UserPreference,
     UxEvent,
@@ -180,6 +183,157 @@ def delete_watch(
     _delete_watch(db, watch_id)
     db.commit()
     return {"status": "ok"}
+
+
+@router.get("/product-health")
+def product_health(db: Session = Depends(get_db), _: User = Depends(require_admin)) -> dict:
+    now = utc_now_naive()
+    daily_from = now - timedelta(days=1)
+    weekly_from = now - timedelta(days=7)
+
+    core_events = [
+        "dashboard_view",
+        "quick_search_executed",
+        "watchlist_refresh",
+        "alert_created",
+        "alert_triggered",
+        "search_empty_results",
+    ]
+
+    usage: dict[str, dict[str, int | str]] = {}
+    for event in core_events:
+        daily_count = int(
+            db.scalar(
+                select(func.count(UxEvent.id)).where(
+                    UxEvent.event_name == event,
+                    UxEvent.created_at >= daily_from,
+                )
+            )
+            or 0
+        )
+        weekly_count = int(
+            db.scalar(
+                select(func.count(UxEvent.id)).where(
+                    UxEvent.event_name == event,
+                    UxEvent.created_at >= weekly_from,
+                )
+            )
+            or 0
+        )
+        usage[event] = {
+            "daily": daily_count,
+            "weekly": weekly_count,
+            "trend": "up" if daily_count > 0 else "flat",
+        }
+
+    quick_search_count = usage["quick_search_executed"]["weekly"] if isinstance(usage["quick_search_executed"]["weekly"], int) else 0
+    empty_count = usage["search_empty_results"]["weekly"] if isinstance(usage["search_empty_results"]["weekly"], int) else 0
+    refresh_count = usage["watchlist_refresh"]["weekly"] if isinstance(usage["watchlist_refresh"]["weekly"], int) else 0
+    alert_created_count = usage["alert_created"]["weekly"] if isinstance(usage["alert_created"]["weekly"], int) else 0
+    dashboard_views = usage["dashboard_view"]["weekly"] if isinstance(usage["dashboard_view"]["weekly"], int) else 0
+
+    quick_search_avg = float(
+        db.scalar(
+            select(func.avg(UxEvent.duration_ms)).where(
+                UxEvent.event_name == "quick_search_executed",
+                UxEvent.created_at >= weekly_from,
+                UxEvent.duration_ms.is_not(None),
+            )
+        )
+        or 0
+    )
+    dashboard_avg = float(
+        db.scalar(
+            select(func.avg(UxEvent.duration_ms)).where(
+                UxEvent.event_name == "dashboard_view",
+                UxEvent.created_at >= weekly_from,
+                UxEvent.duration_ms.is_not(None),
+            )
+        )
+        or 0
+    )
+    refresh_avg = float(
+        db.scalar(
+            select(func.avg(UxEvent.duration_ms)).where(
+                UxEvent.event_name == "watchlist_refresh",
+                UxEvent.created_at >= weekly_from,
+                UxEvent.duration_ms.is_not(None),
+            )
+        )
+        or 0
+    )
+
+    recent_errors = list(
+        db.execute(
+            select(ClientErrorEvent)
+            .order_by(desc(ClientErrorEvent.created_at))
+            .limit(10)
+        ).scalars()
+    )
+    frequent_errors = list(
+        db.execute(
+            select(
+                ClientErrorEvent.message,
+                func.count(ClientErrorEvent.id).label("count"),
+                func.max(ClientErrorEvent.created_at).label("last_seen"),
+            )
+            .group_by(ClientErrorEvent.message)
+            .order_by(desc("count"))
+            .limit(5)
+        )
+    )
+
+    last_alert_execution = db.scalar(
+        select(func.max(UxEvent.created_at)).where(UxEvent.event_name == "alert_triggered")
+    )
+    last_data_update = db.scalar(select(func.max(UxEvent.created_at)))
+
+    error_count_weekly = int(
+        db.scalar(select(func.count(ClientErrorEvent.id)).where(ClientErrorEvent.created_at >= weekly_from)) or 0
+    )
+    system_status = "ok"
+    if error_count_weekly >= 25:
+        system_status = "critical"
+    elif error_count_weekly >= 5:
+        system_status = "degraded"
+
+    return {
+        "usage": usage,
+        "indicators": {
+            "search_empty_rate_pct": round((empty_count / quick_search_count * 100.0), 2) if quick_search_count else 0.0,
+            "watchlist_refresh_to_action_pct": round((alert_created_count / refresh_count * 100.0), 2) if refresh_count else 0.0,
+            "alert_create_rate_pct": round((alert_created_count / dashboard_views * 100.0), 2) if dashboard_views else 0.0,
+        },
+        "performance": {
+            "quick_search_avg_ms": round(quick_search_avg, 2),
+            "dashboard_avg_ms": round(dashboard_avg, 2),
+            "watchlist_refresh_avg_ms": round(refresh_avg, 2),
+        },
+        "errors": {
+            "recent": [
+                {
+                    "section": item.section,
+                    "message": item.message,
+                    "created_at": item.created_at.isoformat(),
+                }
+                for item in recent_errors
+            ],
+            "frequent": [
+                {
+                    "message": row.message,
+                    "count": int(row.count),
+                    "last_seen": row.last_seen.isoformat() if row.last_seen else None,
+                }
+                for row in frequent_errors
+            ],
+            "last_occurrence": recent_errors[0].created_at.isoformat() if recent_errors else None,
+        },
+        "system": {
+            "status": system_status,
+            "last_data_update": last_data_update.isoformat() if last_data_update else None,
+            "last_alert_execution": last_alert_execution.isoformat() if last_alert_execution else None,
+        },
+    }
 
 
 @router.get("/product-metrics", response_model=AdminProductMetricsOut)

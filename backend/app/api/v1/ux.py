@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
 from app.domain.schemas import ClientErrorIn, UxEventIn
-from app.infrastructure.db.models import User, UxEvent
+from app.infrastructure.db.models import ClientErrorEvent, User, UxEvent
 from app.infrastructure.db.session import get_db
 
 router = APIRouter()
@@ -49,6 +49,7 @@ def create_ux_event(
 @router.post("/errors")
 def create_client_error(
     payload: ClientErrorIn,
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> dict[str, str]:
     logger.error(
@@ -58,4 +59,13 @@ def create_client_error(
         payload.message,
         payload.stack or "",
     )
+    db.add(
+        ClientErrorEvent(
+            user_id=current_user.id,
+            section=payload.section,
+            message=payload.message,
+            stack=payload.stack,
+        )
+    )
+    db.commit()
     return {"status": "logged"}
