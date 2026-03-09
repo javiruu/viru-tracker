@@ -3469,13 +3469,6 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
             </div>
           ) : null}
 
-          {searchState === "idle" ? (
-            <div className="qs-state">
-              <h3>{t("searchReadyTitle")}</h3>
-              <p>{t("searchReadyText")}</p>
-              <span className="muted">{t("searchReadyHint")}</span>
-            </div>
-          ) : null}
           {showLoader || loadingVisualHold ? (
             <div className="qs-state qs-state-loading">
               <section
@@ -3557,78 +3550,28 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
               </div>
             </div>
           ) : null}
-          {searchState === "rate" ? (
-            <div className="qs-state">
-              <h3>{t("rateLimitTitle")}</h3>
-              <p>{t("rateLimitText")}</p>
-              <span className="muted">{t("stateRateHint")}</span>
-              <span className="muted">{t("rateLimitCountdown")} {rateLimitSeconds}s</span>
-            </div>
-          ) : null}
-          {searchState === "error" ? (
-            <div className="qs-state">
-              <h3>{t("errorTitle")}</h3>
-              <p>{searchError || t("searchFailed")}</p>
-              <span className="muted">{t("stateErrorHint")}</span>
-              <button type="button" className="btn-ghost" onClick={runSearch}>
-                {t("errorRetry")}
-              </button>
-            </div>
-          ) : null}
-          {searchState === "empty" ? (
-            <div className="qs-state">
-              <h3 className="qs-empty-title">{emptyStateMainTitle}</h3>
-              <p>{t("emptyText")}</p>
-              <span className="muted">{t("stateEmptyHint")}</span>
-              <button
-                type="button"
-                className="btn-search qs-empty-primary-cta"
-                onClick={() => {
-                  setStrictFilters(false);
-                  setRiskFilter("all");
-                  setPriceMin("");
-                  setPriceMax("");
-                }}
-              >
-                {t("emptyCta")}
-              </button>
-              {zeroResultCauses.length > 0 ? (
-                <div className="qs-empty-cause-block">
-                  <strong>{t("emptyLikelyCausesTitle")}</strong>
-                  <ul className="qs-empty-causes">
-                    {visibleZeroResultCauses.map((cause, idx) => (
-                      <li key={`${cause}-${idx}`}>{cause}</li>
-                    ))}
-                  </ul>
-                  {canExpandZeroResultCauses ? (
-                    <button
-                      type="button"
-                      className="btn-ghost btn-compact"
-                      aria-expanded={emptyCausesExpanded}
-                      onClick={() => setEmptyCausesExpanded((prev) => !prev)}
-                    >
-                      {locale === "es" ? (emptyCausesExpanded ? "Ver menos" : "Ver más") : (emptyCausesExpanded ? "Show less" : "Show more")}
-                    </button>
-                  ) : null}
-                </div>
-              ) : null}
-              {zeroResultActions.length > 0 ? (
-                <div className="qs-empty-actions">
-                  <span className="muted">{t("emptyRelaxActionsTitle")}</span>
-                  {zeroResultActions.map((action) => (
-                    <button
-                      key={action.id}
-                      type="button"
-                      className="btn-ghost"
-                      onClick={() => onZeroResultRelaxAction(action.id)}
-                    >
-                      {action.label}
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-          ) : null}
+          <QuickSearchStatePanels
+            searchState={searchState}
+            rateLimitSeconds={rateLimitSeconds}
+            searchError={searchError}
+            emptyStateMainTitle={emptyStateMainTitle}
+            locale={locale}
+            zeroResultCauses={zeroResultCauses}
+            visibleZeroResultCauses={visibleZeroResultCauses}
+            canExpandZeroResultCauses={canExpandZeroResultCauses}
+            emptyCausesExpanded={emptyCausesExpanded}
+            zeroResultActions={zeroResultActions}
+            onToggleEmptyCauses={() => setEmptyCausesExpanded((prev) => !prev)}
+            onRelaxAction={onZeroResultRelaxAction}
+            onRunSearch={runSearch}
+            onEmptyCta={() => {
+              setStrictFilters(false);
+              setRiskFilter("all");
+              setPriceMin("");
+              setPriceMax("");
+            }}
+            t={t}
+          />
           {warningSeverity.critical.length > 0 ? (
             <div className="notice notice-compact notice-error qs-warning-grouped qs-warning-grouped-critical">
               <div className="qs-warning-grouped-head">
