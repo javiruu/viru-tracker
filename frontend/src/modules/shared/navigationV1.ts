@@ -1,7 +1,7 @@
 export const NAV_V1_PRIVATE = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/watchlist", label: "Watchlist" },
-  { href: "/quick-search", label: "Quick search" },
+  { href: "/dashboard", label: "Panel" },
+  { href: "/watchlist", label: "Seguimiento" },
+  { href: "/quick-search", label: "Búsqueda rápida" },
   { href: "/alerts", label: "Alertas" },
   { href: "/recomendaciones", label: "Recomendaciones" },
   { href: "/preferencias", label: "Preferencias" },

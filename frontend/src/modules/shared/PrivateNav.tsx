@@ -13,7 +13,12 @@ export default function PrivateNav() {
       {NAV_V1_PRIVATE.map((item) => {
         const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
         return (
-          <Link key={item.href} href={item.href} className={`private-nav-link${active ? " is-active" : ""}`}>
+          <Link
+            key={item.href}
+            href={item.href}
+            className={`private-nav-link${active ? " is-active" : ""}`}
+            aria-current={active ? "page" : undefined}
+          >
             {item.label}
           </Link>
         );

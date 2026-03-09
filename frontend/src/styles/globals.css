@@ -5657,9 +5657,6 @@ textarea::placeholder {
   position: relative;
 }
 
-.private-layout:has(.watchlist-page) .private-account-anchor {
-  display: none;
-}
 
 .private-account-anchor {
   position: sticky;
@@ -5667,8 +5664,8 @@ textarea::placeholder {
   z-index: 1000;
   display: flex;
   align-items: center;
-  gap: 0.55rem;
-  justify-content: flex-end;
+  justify-content: space-between;
+  gap: 0.9rem;
   width: 100%;
   padding: 10px 16px;
   min-height: 56px;
@@ -5678,8 +5675,15 @@ textarea::placeholder {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
+.private-account-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-left: auto;
+}
+
 .private-content {
-  padding-top: 12px;
+  padding-top: 0;
 }
 
 .private-theme-toggle {
@@ -7855,12 +7859,26 @@ textarea::placeholder {
   }
 
   .private-account-anchor {
-    top: 0.7rem;
-    right: 0.7rem;
+    top: 0;
+    padding: 0.55rem 0.75rem;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0.65rem;
+  }
+
+  .private-nav {
+    order: 2;
+    width: 100%;
+  }
+
+  .private-account-controls {
+    order: 1;
+    width: 100%;
+    justify-content: flex-end;
   }
 
   .account-menu {
-    min-width: 216px;
+    min-width: 198px;
   }
 
   .qs-route {
@@ -9576,23 +9594,42 @@ textarea::placeholder {
 }
 
 .private-nav {
-  display: flex;
-  flex-wrap: wrap;
+  display: inline-flex;
+  align-items: center;
   gap: 8px;
-  margin: 0 0 12px;
+  margin: 0;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
 }
 
 .private-nav-link {
-  font-size: 0.88rem;
-  padding: 6px 10px;
+  flex: 0 0 auto;
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.2;
+  padding: 7px 11px;
   border-radius: 999px;
-  color: var(--text-muted);
-  border: 1px solid var(--line);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-default);
+  background: color-mix(in srgb, var(--surface) 86%, var(--panel-bg));
   text-decoration: none;
+  white-space: nowrap;
+}
+
+.private-nav-link:hover {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border-default));
+  background: color-mix(in srgb, var(--surface-2) 78%, var(--panel-bg));
+}
+
+.private-nav-link:focus-visible {
+  outline: 3px solid var(--border-focus);
+  outline-offset: 2px;
 }
 
 .private-nav-link.is-active {
-  color: var(--text);
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--text-primary);
+  border-color: rgba(217, 93, 57, 0.5);
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+  box-shadow: 0 8px 14px rgba(31, 29, 26, 0.08);
 }
