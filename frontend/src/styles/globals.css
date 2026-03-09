@@ -1379,11 +1379,17 @@ h1 {
 .qs-chip {
   border: 1px solid var(--border);
   border-radius: 999px;
-  padding: 0.2rem 0.6rem;
+  padding: 0.24rem 0.62rem;
   background: var(--surface);
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
+  transition: border-color 0.14s ease, background 0.14s ease;
+}
+
+.qs-chip:hover {
+  border-color: color-mix(in srgb, var(--accent) 38%, var(--border));
+  background: color-mix(in srgb, var(--surface-2) 82%, var(--surface));
 }
 
 .qs-country-row {
@@ -1417,6 +1423,12 @@ h1 {
   align-items: center;
   gap: 0.6rem;
   flex-wrap: wrap;
+}
+
+.qs-results-controls .qs-input,
+.qs-results-controls .btn-ghost,
+.qs-results-controls .qs-results-explain-chip {
+  min-height: 2.25rem;
 }
 
 .qs-active-chips {

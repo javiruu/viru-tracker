@@ -2451,7 +2451,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
                       }
                     }
                   }}
-                  placeholder={originCountryOnly ? originCountryOnly.name : "MAD"}
+                  placeholder={originCountryOnly ? originCountryOnly.name : t("placeholderOrigin")}
                   aria-invalid={(originTouched && !originValid) || Boolean(fieldErrors.origin_iata)}
                   aria-describedby="origin-help"
                   aria-expanded={activeAutocompleteField === "origin"}
@@ -2627,7 +2627,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
                       }
                     }
                   }}
-                  placeholder={destinationCountryOnly ? destinationCountryOnly.name : "DUB"}
+                  placeholder={destinationCountryOnly ? destinationCountryOnly.name : t("placeholderDestination")}
                   aria-invalid={(destinationTouched && !destinationValid) || Boolean(fieldErrors.destination_iata)}
                   aria-describedby="destination-help"
                   aria-expanded={activeAutocompleteField === "destination"}
@@ -2786,7 +2786,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
                 }}
                 aria-invalid={(dateTouched && !travelDate) || Boolean(fieldErrors.travel_date)}
               />
-              {!travelDate ? <span className="qs-date-placeholder" aria-hidden="true">DD/MM/AAAA</span> : null}
+              {!travelDate ? <span className="qs-date-placeholder" aria-hidden="true">{t("placeholderDates")}</span> : null}
               <span className="qs-date-inline-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
                   <rect x="3" y="4" width="18" height="17" rx="3" fill="none" stroke="currentColor" strokeWidth="1.6" />
@@ -2841,7 +2841,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
                   onChange={(e) => setReturnDate(e.target.value)}
                   min={travelDate || undefined}
                 />
-                {!returnDate ? <span className="qs-date-placeholder" aria-hidden="true">DD/MM/AAAA</span> : null}
+                {!returnDate ? <span className="qs-date-placeholder" aria-hidden="true">{t("placeholderDates")}</span> : null}
                 <span className="qs-date-inline-icon" aria-hidden="true">
                   <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
                     <rect x="3" y="4" width="18" height="17" rx="3" fill="none" stroke="currentColor" strokeWidth="1.6" />
@@ -2963,7 +2963,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
           <div className="qs-filters-grid">
             <div className="qs-filter-group qs-filter-core">
               <div className="qs-filter-head">
-                <h3>Core</h3>
+                <h3>{t("infoSectionTitle")}</h3>
               </div>
               <div className="qs-filter-grid">
                 <label className="field">
@@ -3456,7 +3456,13 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
                 {t("resetAll")}
               </button>
               {activeChips.map((chip) => (
-                <button key={chip.id} type="button" className="qs-chip" onClick={chip.onClear}>
+                <button
+                  key={chip.id}
+                  type="button"
+                  className="qs-chip"
+                  onClick={chip.onClear}
+                  aria-label={t("ariaRemoveFilter").replace("{value}", chip.label)}
+                >
                   {chip.label} <span aria-hidden="true">x</span>
                 </button>
               ))}
