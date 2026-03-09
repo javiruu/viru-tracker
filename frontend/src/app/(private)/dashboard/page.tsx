@@ -12,7 +12,7 @@ type Watch = { id: string; origin_iata: string; destination_iata: string; status
 type Note = { id: string; title: string; body: string; created_at: string; updated_at: string };
 
 type BackendBanner = {
-  severity: "warn" | "error";
+  severity: "warning" | "error";
   message: string;
 };
 
@@ -52,7 +52,7 @@ export default function DashboardPage() {
     } catch {
       const fallback = t("dashboard.banner.warmMessage");
       setBackendBanner({
-        severity: "warn",
+        severity: "warning",
         message: fallback,
       });
     }

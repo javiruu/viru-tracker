@@ -50,9 +50,9 @@ function deliveryStatusLabel(status: string): string {
   return status;
 }
 
-function deliveryStatusTone(status: string): "warn" | "success" | "error" {
+function deliveryStatusTone(status: string): "warning" | "success" | "error" {
   const normalized = status.toLowerCase();
-  if (normalized === "queued") return "warn";
+  if (normalized === "queued") return "warning";
   if (normalized === "sent" || normalized === "delivered") return "success";
   return "error";
 }
@@ -409,7 +409,7 @@ export default function AlertsPage() {
                   <button className="btn-ghost" type="button" onClick={() => removeRule(rule)}>
                     {t("alerts.row.actions.delete")}
                   </button>
-                  <span className={`status-pill ${rule.enabled ? "success" : "warn"}`}>
+                  <span className={`status-pill ${rule.enabled ? "success" : "warning"}`}>
                     {rule.enabled ? t("alerts.row.status.active") : t("alerts.row.status.paused")}
                   </span>
                 </div>

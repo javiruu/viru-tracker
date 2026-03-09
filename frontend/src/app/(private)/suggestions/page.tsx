@@ -89,7 +89,7 @@ export default function SuggestionsPage() {
               placeholder={t("suggestions.placeholder")}
             />
             <div className="char-counter">
-              <span className={`counter-chip ${remaining < 0 ? "danger" : remaining < 80 ? "warn" : ""}`}>
+              <span className={`counter-chip ${remaining < 0 ? "danger" : remaining < 80 ? "warning" : ""}`}>
                 {counterLabel}
               </span>
               <span>{text.length}/{MAX_LEN}</span>

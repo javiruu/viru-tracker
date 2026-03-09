@@ -3645,7 +3645,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
                   ) : null}
                 </p>
               ) : null}
-              {weatherMessage ? <div className="notice notice-compact notice-warn">{weatherMessage}</div> : null}
+              {weatherMessage ? <div className="notice notice-compact notice-warning">{weatherMessage}</div> : null}
               <p className="panel-note qs-disclaimer">
                 {t("disclaimer")} {t("disclaimerWatchlistCta")}
               </p>

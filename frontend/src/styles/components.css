@@ -186,8 +186,7 @@
   color: var(--state-success-text);
 }
 
-.status-pill.warning,
-.status-pill.warn {
+.status-pill.warning {
   background: var(--state-warning-bg);
   border-color: var(--state-warning-border);
   color: var(--state-warning-text);

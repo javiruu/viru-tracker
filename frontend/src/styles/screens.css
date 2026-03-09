@@ -2546,7 +2546,7 @@ h1 {
   font-weight: 600;
 }
 
-.counter-chip.warn {
+.counter-chip.warning {
   border-color: rgba(199, 154, 58, 0.5);
   background: rgba(199, 154, 58, 0.16);
   color: #7c5b18;
@@ -6873,8 +6873,7 @@ textarea::placeholder {
   color: var(--state-success-text);
 }
 
-.notice-warning,
-.notice-warn {
+.notice-warning {
   border-color: var(--state-warning-border);
   background: var(--state-warning-bg);
   color: var(--state-warning-text);

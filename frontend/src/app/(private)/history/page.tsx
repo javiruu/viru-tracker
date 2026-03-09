@@ -3,13 +3,12 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-import { resolveBridgeRoute } from "@/modules/shared/routeBridges";
 
 export default function HistoryPage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace(resolveBridgeRoute("/history"));
+    router.replace("/watchlist");
   }, [router]);
 
   return (

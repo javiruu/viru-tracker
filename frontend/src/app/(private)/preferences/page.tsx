@@ -4,13 +4,12 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import AirLoader from "@/modules/shared/AirLoader";
-import { resolveBridgeRoute } from "@/modules/shared/routeBridges";
 
 export default function PreferencesRedirectPage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace(resolveBridgeRoute("/preferences"));
+    router.replace("/preferencias");
   }, [router]);
 
   return (

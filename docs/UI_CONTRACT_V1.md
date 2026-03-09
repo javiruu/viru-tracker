@@ -127,6 +127,11 @@ Estados breves:
 3. Repetir términos de glosario en todos los módulos.
 4. Si hay error, indicar acción siguiente cuando aplique.
 
+## Convenciones legacy / deprecación
+- Rutas canónicas: `/dashboard`, `/watchlist`, `/quick-search`, `/alerts`, `/preferencias`.
+- Puentes legacy permitidos por compatibilidad: `/history`, `/preferences` (redirigen a canónica).
+- Evitar clases ambiguas de estado legacy (`warn`) en nuevos cambios. Usar `warning`.
+
 ## Reglas de regresión
 1. Todo refactor de estilos requiere build OK.
 2. No introducir cambios visuales no intencionados.
