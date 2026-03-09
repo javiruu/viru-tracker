@@ -1,1 +1,41 @@
-/* Tokens layer (v1): design tokens remain source-of-truth in screens.css while we migrate incrementally. */
+/* Tokens layer (v1): centralized semantic state tokens */
+
+:root {
+  --state-success-bg: rgba(46, 110, 98, 0.12);
+  --state-success-border: rgba(46, 110, 98, 0.4);
+  --state-success-text: var(--ink);
+  --state-success-icon: var(--accent-2);
+
+  --state-warning-bg: rgba(205, 154, 86, 0.12);
+  --state-warning-border: rgba(205, 154, 86, 0.42);
+  --state-warning-text: var(--ink);
+  --state-warning-icon: #b67722;
+
+  --state-error-bg: rgba(217, 93, 57, 0.12);
+  --state-error-border: rgba(217, 93, 57, 0.4);
+  --state-error-text: var(--ink);
+  --state-error-icon: var(--accent);
+
+  --state-info-bg: rgba(79, 127, 166, 0.1);
+  --state-info-border: rgba(79, 127, 166, 0.36);
+  --state-info-text: var(--ink);
+  --state-info-icon: #4f7fa6;
+}
+
+:root[data-theme="dark"] {
+  --state-success-bg: color-mix(in srgb, #2e6e62 28%, transparent);
+  --state-success-border: color-mix(in srgb, #2e6e62 55%, #d7e5df 18%);
+  --state-success-text: var(--ink);
+
+  --state-warning-bg: color-mix(in srgb, #cd9a56 24%, transparent);
+  --state-warning-border: color-mix(in srgb, #cd9a56 55%, #f1dfc3 16%);
+  --state-warning-text: var(--ink);
+
+  --state-error-bg: color-mix(in srgb, #d95d39 25%, transparent);
+  --state-error-border: color-mix(in srgb, #d95d39 56%, #f3d0c5 16%);
+  --state-error-text: var(--ink);
+
+  --state-info-bg: color-mix(in srgb, #4f7fa6 22%, transparent);
+  --state-info-border: color-mix(in srgb, #4f7fa6 52%, #cfdceb 16%);
+  --state-info-text: var(--ink);
+}

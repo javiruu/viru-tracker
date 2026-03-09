@@ -24,6 +24,39 @@
   align-items: center;
 }
 
+.state-success,
+.state-warning,
+.state-error,
+.state-info {
+  border-width: 1px;
+  border-style: solid;
+  font-weight: 600;
+}
+
+.state-success {
+  background: var(--state-success-bg);
+  border-color: var(--state-success-border);
+  color: var(--state-success-text);
+}
+
+.state-warning {
+  background: var(--state-warning-bg);
+  border-color: var(--state-warning-border);
+  color: var(--state-warning-text);
+}
+
+.state-error {
+  background: var(--state-error-bg);
+  border-color: var(--state-error-border);
+  color: var(--state-error-text);
+}
+
+.state-info {
+  background: var(--state-info-bg);
+  border-color: var(--state-info-border);
+  color: var(--state-info-text);
+}
+
 .status-pill {
   display: inline-flex;
   align-items: center;
@@ -36,16 +69,26 @@
 }
 
 .status-pill.success {
-  border-color: rgba(46, 110, 98, 0.4);
-  background: rgba(46, 110, 98, 0.12);
+  background: var(--state-success-bg);
+  border-color: var(--state-success-border);
+  color: var(--state-success-text);
 }
 
+.status-pill.warning,
 .status-pill.warn {
-  border-color: rgba(79, 127, 166, 0.4);
-  background: rgba(79, 127, 166, 0.14);
+  background: var(--state-warning-bg);
+  border-color: var(--state-warning-border);
+  color: var(--state-warning-text);
 }
 
 .status-pill.error {
-  border-color: rgba(217, 93, 57, 0.4);
-  background: rgba(217, 93, 57, 0.14);
+  background: var(--state-error-bg);
+  border-color: var(--state-error-border);
+  color: var(--state-error-text);
+}
+
+.status-pill.info {
+  background: var(--state-info-bg);
+  border-color: var(--state-info-border);
+  color: var(--state-info-text);
 }
