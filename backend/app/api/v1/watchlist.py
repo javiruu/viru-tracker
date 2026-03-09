@@ -1,4 +1,6 @@
-﻿import os
+﻿import json
+import logging
+import os
 from datetime import timedelta
 
 from app.core.time import utc_now_naive
@@ -6,6 +8,7 @@ from app.core.time import utc_now_naive
 from fastapi import APIRouter, Depends, Header, HTTPException
 from fastapi.responses import JSONResponse
 
+from app.core.errors import error_envelope, message_for_code
 from app.core.idempotency import replay_if_exists, request_hash, store_response
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -18,6 +21,7 @@ from app.infrastructure.providers.ryanair_public_provider import RyanairPublicPr
 
 router = APIRouter()
 provider = RyanairPublicProvider()
+logger = logging.getLogger("app.watchlist")
 REFRESH_COOLDOWN_SECONDS = max(0, int(os.getenv("WATCH_REFRESH_COOLDOWN_SECONDS", "60")))
 
 
@@ -134,9 +138,34 @@ def refresh_watch(
             .order_by(PriceSnapshot.captured_at_utc.desc(), PriceSnapshot.id.desc())
         )
         if latest_snapshot:
+            current_utc = utc_now_naive()
             earliest_next_refresh = latest_snapshot.captured_at_utc + timedelta(seconds=REFRESH_COOLDOWN_SECONDS)
-            if earliest_next_refresh > utc_now_naive():
-                raise HTTPException(status_code=429, detail="refresh_cooldown_active")
+            if earliest_next_refresh > current_utc:
+                retry_after = max(1, int((earliest_next_refresh - current_utc).total_seconds()))
+                logger.info(
+                    json.dumps(
+                        {
+                            "event": "watch_refresh_denied_cooldown",
+                            "user_id": current_user.id,
+                            "watch_id": watch.id,
+                            "retry_after_sec": retry_after,
+                            "cooldown_sec": REFRESH_COOLDOWN_SECONDS,
+                        },
+                        ensure_ascii=False,
+                    )
+                )
+                response = JSONResponse(
+                    status_code=429,
+                    content=error_envelope(
+                        status=429,
+                        code="refresh_cooldown_active",
+                        message=message_for_code("refresh_cooldown_active", fallback="Refresh cooldown active."),
+                        details=[],
+                        retry_after_sec=retry_after,
+                    ),
+                )
+                response.headers["Retry-After"] = str(retry_after)
+                return response
 
     try:
         flights = provider.get_flights(
