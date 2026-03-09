@@ -49,14 +49,11 @@ export default function DashboardPage() {
       setWatches(watchData);
       setNotes(noteData);
       setBackendBanner(null);
-    } catch (error) {
+    } catch {
       const fallback = t("dashboard.banner.warmMessage");
-      const raw = error instanceof Error ? error.message : fallback;
-      const lower = raw.toLowerCase();
-      const hardError = lower.includes("http 5") || lower.includes("network") || lower.includes("backend");
       setBackendBanner({
-        severity: hardError ? "error" : "warn",
-        message: hardError ? t("dashboard.banner.hardMessage") : fallback,
+        severity: "warn",
+        message: fallback,
       });
     }
   }, [t]);
