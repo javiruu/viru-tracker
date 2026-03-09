@@ -64,7 +64,7 @@ export function QuickSearchResultsList(props: Props) {
                   {props.compactView ? (
                     <>
                       <div className="qs-result-route">
-                        <strong>{r.origin}{" -> "}{r.destination}</strong>
+                        <strong>{r.origin}{" → "}{r.destination}</strong>
                         {(r.origin !== props.origin || r.destination !== props.destination) ? <span className="chip">{props.t("alternative")}</span> : null}
                       </div>
                       <div className="qs-result-meta qs-result-meta-compact">
@@ -78,7 +78,7 @@ export function QuickSearchResultsList(props: Props) {
                     <>
                       <span className="qs-result-kicker">{props.t("resultsColRoute")}</span>
                       <div className="qs-result-route">
-                        <strong>{r.origin}{" -> "}{r.destination}</strong>
+                        <strong>{r.origin}{" → "}{r.destination}</strong>
                         {(r.origin !== props.origin || r.destination !== props.destination) ? <span className="chip">{props.t("alternative")}</span> : null}
                       </div>
                       <div className="qs-result-meta">
@@ -228,7 +228,7 @@ export function QuickSearchResultsList(props: Props) {
                         <strong>{props.t("detailsLegs")}</strong>
                         {r.legs.map((leg, legIdx) => (
                           <div key={`${rowId}-leg-${legIdx}`} className="qs-leg-row">
-                            <span>{leg.origin_iata} {" -> "} {leg.destination_iata}</span>
+                            <span>{leg.origin_iata} {" → "} {leg.destination_iata}</span>
                             <span>{new Date(leg.dep_ts).toLocaleTimeString(props.localeTag, { hour: "2-digit", minute: "2-digit" })}</span>
                             <span>{new Date(leg.arr_ts).toLocaleTimeString(props.localeTag, { hour: "2-digit", minute: "2-digit" })}</span>
                           </div>

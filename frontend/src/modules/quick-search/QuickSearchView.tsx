@@ -3469,87 +3469,23 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
             </div>
           ) : null}
 
-          {showLoader || loadingVisualHold ? (
-            <div className="qs-state qs-state-loading">
-              <section
-                className="qs-boarding"
-                role="status"
-                aria-live="polite"
-                aria-label={t("loadingAria")}
-                style={{ width: "100%", maxWidth: 520, margin: "0 auto 8px", minHeight: 110 }}
-              >
-                <div
-                  className="qs-boarding-head"
-                  style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 8 }}
-                >
-                  <span className="muted">{loadingPhaseLabel}</span>
-                  <strong>{progressPercent}%</strong>
-                </div>
-                <div className="qs-boarding-subchecks" aria-label={t("loadingSubcheckTitle")}>
-                  <span className="qs-boarding-subchecks-title">{t("loadingSubcheckTitle")}</span>
-                  <ul className="qs-boarding-subchecks-list">
-                    {loadingSubchecks.map((item) => (
-                      <li key={item.id} className={`qs-boarding-subcheck qs-boarding-subcheck--${item.status}`}>
-                        <span className="qs-boarding-subcheck-dot" aria-hidden="true" />
-                        <span className="qs-boarding-subcheck-text">{item.label}</span>
-                        <span className="qs-boarding-subcheck-state">
-                          {item.status === "done" ? t("loadingSubcheckDone") : item.status === "active" ? t("loadingSubcheckActive") : ""}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="qs-boarding-track qs-loading-progress" aria-hidden="true">
-                  <div
-                    style={{
-                      width: `${progressPercent}%`,
-                      height: 10,
-                      borderRadius: 999,
-                      background: "var(--qs-boarding-ink, #0F172A)",
-                      transition: prefersReducedMotion ? "none" : "width 180ms ease",
-                      position: "absolute",
-                      left: 10,
-                      right: "auto",
-                      top: 10,
-                    }}
-                  />
-                  <div
-                    className="qs-boarding-passengers"
-                    data-no-marker="true"
-                    style={{
-                      ["--qs-board-step" as any]: boardedCount,
-                      visibility: showBoarding ? "visible" : "hidden",
-                    }}
-                  >
-                    {Array.from({ length: boardingPassengers }).map((_, idx) => {
-                      const isHidden = !showBoarding || idx < boardedCount;
-                      return (
-                        <span
-                          key={`boarding-passenger-${idx}`}
-                          style={{ visibility: isHidden ? "hidden" : "visible" }}
-                        />
-                      );
-                    })}
-                  </div>
-                  <span
-                    className={`qs-boarding-plane${progressPercent >= 95 && progressPercent < 100 ? " qs-boarding-plane--ready" : ""}${progressPercent === 100 ? " qs-boarding-plane--takeoff" : ""}`}
-                  />
-                </div>
-              </section>
-              <h3>{t("loadingTitle")}</h3>
-              <p>{t("loadingText")}</p>
-              <div className="qs-skeleton-cards" aria-hidden="true">
-                {Array.from({ length: 4 }).map((_, idx) => (
-                  <article key={`skeleton-card-${idx}`} className="qs-skeleton-card">
-                    <div className="qs-skeleton-row qs-skeleton-route" />
-                    <div className="qs-skeleton-row qs-skeleton-meta" />
-                    <div className="qs-skeleton-row qs-skeleton-meta short" />
-                    <div className="qs-skeleton-row qs-skeleton-price" />
-                  </article>
-                ))}
-              </div>
-            </div>
-          ) : null}
+          <QuickSearchLoadingProgress
+            show={showLoader}
+            loadingVisualHold={loadingVisualHold}
+            loadingAria={t("loadingAria")}
+            loadingPhaseLabel={loadingPhaseLabel}
+            progressPercent={progressPercent}
+            loadingSubcheckTitle={t("loadingSubcheckTitle")}
+            loadingSubchecks={loadingSubchecks}
+            loadingSubcheckDone={t("loadingSubcheckDone")}
+            loadingSubcheckActive={t("loadingSubcheckActive")}
+            prefersReducedMotion={prefersReducedMotion}
+            boardedCount={boardedCount}
+            showBoarding={showBoarding}
+            boardingPassengers={boardingPassengers}
+            loadingTitle={t("loadingTitle")}
+            loadingText={t("loadingText")}
+          />
           <QuickSearchStatePanels
             searchState={searchState}
             rateLimitSeconds={rateLimitSeconds}
@@ -3608,232 +3544,43 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
             </div>
           ) : null}
 
-          {visibleResults.length > 0 ? (
-            <div className={`qs-results-list ${compactView ? "compact" : ""}`}>
-              {visibleResults.map((r, idx) => {
-                const rowId = resultKey(r, idx);
-                const rowLink = r.deeplink_url || deeplinkUrl;
-                const expanded = Boolean(expandedRows[rowId]);
-                const detailsId = `details-${rowId}`;
-                const compactTag = getResultTags(r, "compact")[0];
-                const departureCompact = r.departure_time_local || "--";
-                const rowDurationLabel = r.duration_total_min ? `${r.duration_total_min} min` : "--";
-                const rowRiskLabel = r.risk_label ? formatRiskLabel(r.risk_label) : "--";
-                const rowFreshnessLabel = r.stale_data
-                  ? t("freshnessStale")
-                  : r.freshness_ts
-                    ? formatFreshness(r.freshness_ts)
-                    : "--";
-                return (
-                  <article
-                    key={rowId}
-                    className={`qs-result-row ${expanded ? "expanded" : ""} ${compactView ? "qs-result-row-compact" : ""}`}
-                  >
-                    <div className="qs-result-main">
-                      {compactView ? (
-                        <>
-                          <div className="qs-result-route">
-                            <strong>{r.origin}{" → "}{r.destination}</strong>
-                            {(r.origin !== origin || r.destination !== destination) ? (
-                              <span className="chip">{t("alternative")}</span>
-                            ) : null}
-                          </div>
-                          <div className="qs-result-meta qs-result-meta-compact">
-                            <span>{departureCompact}</span>
-                          </div>
-                          <div className="qs-result-badges">
-                            <span className={`qs-tag qs-tag-${compactTag.tone}`}>
-                              {compactTag.label}
-                            </span>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <span className="qs-result-kicker">{t("resultsColRoute")}</span>
-                          <div className="qs-result-route">
-                            <strong>{r.origin}{" → "}{r.destination}</strong>
-                            {(r.origin !== origin || r.destination !== destination) ? (
-                              <span className="chip">{t("alternative")}</span>
-                            ) : null}
-                          </div>
-                          <div className="qs-result-meta">
-                            <span>{r.travel_date}</span>
-                            {r.departure_time_local ? <span>{" - "}{r.departure_time_local}</span> : null}
-                            {r.distance_km_ground ? <span>{" - "}{r.distance_km_ground} km</span> : null}
-                          </div>
-                          <div className="qs-result-stats">
-                            <span><strong>{t("resultsColDuration")}:</strong> {rowDurationLabel}</span>
-                            <span><strong>{t("resultsColRisk")}:</strong> {rowRiskLabel}</span>
-                            <span><strong>{t("resultsColFreshness")}:</strong> {rowFreshnessLabel}</span>
-                          </div>
-                          <div className="qs-result-badges">
-                            {getResultTags(r, "normal").map((tag) => (
-                              <span key={`${rowId}-${tag.key}`} className={`qs-tag qs-tag-${tag.tone}`}>
-                                {tag.label}
-                              </span>
-                            ))}
-                          </div>
-                        </>
-                      )}
-                    </div>
-                    <div className="qs-result-actions">
-                      <div className="qs-result-price">
-                        {!compactView ? <span className="qs-result-kicker">{t("resultsColPrice")}</span> : null}
-                        <strong>{formatMoney(r.price_total ?? r.price, r.currency)}</strong>
-                        {!compactView && r.ranking_score ? <span>{t("score")} {formatScore(r.ranking_score)}</span> : null}
-                      </div>
-                      <div className="qs-result-buttons">
-                        <button className="btn-primary qs-row-save" type="button" onClick={() => addToWatchlist(r)}>
-                          {t("save")}
-                        </button>
-                        {!compactView ? (
-                          <button
-                            type="button"
-                            className="btn-ghost qs-result-details-link"
-                            aria-expanded={expanded}
-                            aria-controls={detailsId}
-                            onClick={() => {
-                              setExpandedRows((prev) => ({ ...prev, [rowId]: !prev[rowId] }));
-                              setSelectedResultId(rowId);
-                            }}
-                          >
-                            {expanded ? t("detailsHide") : t("detailsToggle")}
-                          </button>
-                        ) : null}
-                        <div className="qs-row-menu-wrap">
-                          <button
-                            type="button"
-                            className="btn-ghost qs-row-menu-trigger"
-                            aria-haspopup="menu"
-                            aria-expanded={openRowMenuId === rowId}
-                            aria-controls={`row-menu-${rowId}`}
-                            aria-label={t("rowActionsMoreAria")}
-                            ref={(node) => {
-                              rowMenuTriggerRefs.current[rowId] = node;
-                            }}
-                            onClick={() => {
-                              setOpenRowMenuId((prev) => {
-                                const next = prev === rowId ? null : rowId;
-                                if (next === rowId) {
-                                  trackEvent("quicksearch_row_overflow_opened", { row_id: rowId });
-                                }
-                                return next;
-                              });
-                            }}
-                          >
-                            ⋯
-                          </button>
-                          {openRowMenuId === rowId ? (
-                            <div
-                              id={`row-menu-${rowId}`}
-                              className="qs-row-menu"
-                              role="menu"
-                              aria-label={t("rowActionsMenuAria")}
-                              onKeyDown={(event) => {
-                                if (event.key === "Escape") {
-                                  event.preventDefault();
-                                  closeRowMenu(rowId);
-                                }
-                              }}
-                            >
-                              <button
-                                type="button"
-                                role="menuitem"
-                                className="qs-row-menu-item"
-                                onClick={() => {
-                                  trackEvent("quicksearch_row_copy_params_clicked", { row_id: rowId });
-                                  setCopyModalPayload(fallbackPayload);
-                                  setCopyModalOpen(true);
-                                  setOpenRowMenuId(null);
-                                }}
-                              >
-                                {t("deepLinkAlt")}
-                              </button>
-                              {rowLink ? (
-                                <a
-                                  role="menuitem"
-                                  className="qs-row-menu-item"
-                                  href={rowLink}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  onClick={() => {
-                                    trackOpenRyanair();
-                                    setOpenRowMenuId(null);
-                                  }}
-                                >
-                                  {t("deepLink")}
-                                </a>
-                              ) : null}
-                            </div>
-                          ) : null}
-                        </div>
-                      </div>
-                    </div>
-                    {!compactView && expanded ? (
-                      <div className="qs-result-details" id={detailsId}>
-                        <div className="qs-result-detail-tags">
-                          {getResultTags(r, "expanded").map((tag) => (
-                            <span key={`${detailsId}-${tag.key}`} className={`qs-tag qs-tag-${tag.tone}`}>
-                              {tag.label}
-                            </span>
-                          ))}
-                          {r.minutes_buffer !== null && r.minutes_buffer !== undefined ? (
-                            <span className="qs-tag qs-tag-fresh">{t("detailsBuffer")} {r.minutes_buffer} min</span>
-                          ) : null}
-                          {r.duration_total_min !== null && r.duration_total_min !== undefined ? (
-                            <span className="qs-tag qs-tag-fresh">{t("resultsColDuration")}: {r.duration_total_min} min</span>
-                          ) : null}
-                        </div>
-                        <div>
-                          <strong>{t("detailsAlt")}</strong>
-                          <p>
-                            {r.distance_km_ground ? `${r.distance_km_ground} km` : "--"} - {t("summaryRadius")} {radiusKm} km
-                          </p>
-                        </div>
-                        <div>
-                          <strong>{t("detailsWindow")}</strong>
-                          <p>{departAfter} - {departBefore}</p>
-                        </div>
-                        <div>
-                          <strong>{t("detailsRisk")}</strong>
-                          <p>{formatRiskLabel(r.risk_label)} - {t("detailsBuffer")} {formatMinutes(r.minutes_buffer)}</p>
-                        </div>
-                        <div>
-                          <strong>{t("detailsScore")}</strong>
-                          <p>{t("scoreHint")} - {r.ranking_score ? formatScore(r.ranking_score) : "--"}</p>
-                        </div>
-                        <div>
-                          <strong>{t("source")}</strong>
-                          <p>{(r.source || "").trim() || t("sourceUnknown")}</p>
-                        </div>
-                        {r.legs && r.legs.length > 0 ? (
-                          <div className="qs-legs">
-                            <strong>{t("detailsLegs")}</strong>
-                            {r.legs.map((leg, legIdx) => (
-                              <div key={`${rowId}-leg-${legIdx}`} className="qs-leg-row">
-                                <span>{leg.origin_iata} {" → "} {leg.destination_iata}</span>
-                                <span>{new Date(leg.dep_ts).toLocaleTimeString(localeTag, { hour: "2-digit", minute: "2-digit" })}</span>
-                                <span>{new Date(leg.arr_ts).toLocaleTimeString(localeTag, { hour: "2-digit", minute: "2-digit" })}</span>
-                              </div>
-                            ))}
-                          </div>
-                        ) : null}
-                      </div>
-                    ) : null}
-                  </article>
-                );
-              })}
-            </div>
-          ) : null}
+          <QuickSearchResultsList
+            visibleResults={visibleResults}
+            compactView={compactView}
+            expandedRows={expandedRows}
+            openRowMenuId={openRowMenuId}
+            deeplinkUrl={deeplinkUrl}
+            hiddenHighRiskResults={hiddenHighRiskResults}
+            showHighRisk={showHighRisk}
+            origin={origin}
+            destination={destination}
+            radiusKm={radiusKm}
+            departAfter={departAfter}
+            departBefore={departBefore}
+            localeTag={localeTag}
+            fallbackPayload={fallbackPayload}
+            rowMenuTriggerRefs={rowMenuTriggerRefs}
+            t={t}
+            formatMoney={formatMoney}
+            formatScore={formatScore}
+            formatRiskLabel={formatRiskLabel}
+            formatFreshness={formatFreshness}
+            formatMinutes={formatMinutes}
+            resultKey={resultKey}
+            getResultTags={getResultTags}
+            addToWatchlist={addToWatchlist}
+            setExpandedRows={setExpandedRows}
+            setSelectedResultId={setSelectedResultId}
+            setOpenRowMenuId={setOpenRowMenuId}
+            setCopyModalPayload={setCopyModalPayload}
+            setCopyModalOpen={setCopyModalOpen}
+            closeRowMenu={closeRowMenu}
+            onTrackOpenRyanair={trackOpenRyanair}
+            onToggleHighRisk={() => setShowHighRisk((prev) => !prev)}
+            onTrackRowOverflow={(rowId) => trackEvent("quicksearch_row_overflow_opened", { row_id: rowId })}
+            onTrackCopyParams={(rowId) => trackEvent("quicksearch_row_copy_params_clicked", { row_id: rowId })}
+          />
 
-          {hiddenHighRiskResults.length > 0 ? (
-            <div className="qs-hidden-risk">
-              <span>{t("riskHidden")}: {hiddenHighRiskResults.length}</span>
-              <button type="button" className="btn-ghost" onClick={() => setShowHighRisk((prev) => !prev)}>
-                {showHighRisk ? t("riskHideHidden") : t("riskShowHidden")}
-              </button>
-            </div>
-          ) : null}
           <details
             className="qs-info-stack"
             open={infoExpanded}
