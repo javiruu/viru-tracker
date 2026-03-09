@@ -3,7 +3,7 @@ export const dashboardEs = {
     title: "Hoy en Viru",
     status: "{count} vuelos vigilados · {activity}",
     onboardingTitle: "Aún no vigilas vuelos.",
-    onboardingBody: "Empieza explorando rutas y crea tu primera watchlist.",
+    onboardingBody: "Empieza explorando rutas y crea tu primer seguimiento.",
     noOpportunityTitle: "Nada urgente hoy.",
     noOpportunityBody: "Explora nuevas rutas y activa alertas cuando veas oportunidad.",
     ctaOpportunity: "Buscar nuevas rutas ahora",
@@ -25,16 +25,16 @@ export const dashboardEs = {
     userNote: "Conectado",
     flightsTitle: "Vuelos activos",
     flightsValue: "{count} vuelos activos",
-    flightsNoteEmpty: "Empieza añadiendo uno en Watchlist.",
+    flightsNoteEmpty: "Empieza añadiendo uno en Seguimiento.",
     flightsNoteActive: "Seguimiento en tiempo real.",
     activityTitle: "Estado de actividad",
     activityNote: "Resumen no técnico de tu uso reciente.",
   },
   modules: {
     watchlist: {
-      title: "Watchlist",
-      desc: "Controla rutas activas, precio objetivo y refrescos inmediatos.",
-      primary: "Abrir watchlist",
+      title: "Seguimiento",
+      desc: "Controla rutas activas, precio objetivo y actualizaciones inmediatas.",
+      primary: "Abrir seguimiento",
       secondary: "Ver análisis",
     },
     quickSearch: {
@@ -69,7 +69,7 @@ export const dashboardEs = {
   },
   sections: {
     manage: "Gestionar tus vuelos",
-    manageHint: "Controla watchlist, alertas y análisis en un solo lugar.",
+    manageHint: "Controla seguimiento, alertas y análisis en un solo lugar.",
     opportunities: "Descubrimiento",
   },
   opportunities: {
@@ -170,7 +170,7 @@ export const dashboardEs = {
     lastSearchDate: "Última búsqueda el {date}",
     noteUpdated: "Nota actualizada: {title}",
     noteUntitled: "Nota sin título",
-    watchActive: "Watchlist activa: {origin} → {destination}",
+    watchActive: "Seguimiento activo: {origin} → {destination}",
     watchWhen: "Seguimiento continuo",
     emptyText: "Sin actividad reciente. Empieza por Búsqueda rápida.",
     now: "Ahora",

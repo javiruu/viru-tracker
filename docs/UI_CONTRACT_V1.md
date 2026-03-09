@@ -96,6 +96,37 @@ Componentes que deben consumir esta semántica:
 Compatibilidad legacy:
 - `warn` se mantiene como alias temporal de `warning`.
 
+## Glosario UI (ES)
+Términos preferidos en la interfaz visible:
+- Panel
+- Seguimiento
+- Búsqueda rápida
+- Alerta
+- Histórico
+- Comparativa
+- Preferencias
+- Ayuda
+
+Verbos preferidos:
+- Buscar
+- Actualizar
+- Guardar
+- Eliminar
+- Activar / Desactivar
+- Reintentar
+
+Estados breves:
+- Cargando…
+- Sin resultados
+- Error
+- Listo
+
+## Reglas de microcopy breve
+1. Mensajes operativos de una o dos frases.
+2. Evitar mezcla ES/EN en UI visible.
+3. Repetir términos de glosario en todos los módulos.
+4. Si hay error, indicar acción siguiente cuando aplique.
+
 ## Reglas de regresión
 1. Todo refactor de estilos requiere build OK.
 2. No introducir cambios visuales no intencionados.
