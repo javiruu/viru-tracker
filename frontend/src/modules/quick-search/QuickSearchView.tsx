@@ -1719,7 +1719,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
   const summaryDate = travelDate ? formatShortDate(travelDate) : "--";
   const summaryOriginLabel = originCountryOnly ? originCountryOnly.name : (origin || "---");
   const summaryDestinationLabel = destinationCountryOnly ? destinationCountryOnly.name : (destination || "---");
-  const summaryTrip = `${summaryOriginLabel} -> ${summaryDestinationLabel}`;
+  const summaryTrip = `${summaryOriginLabel} → ${summaryDestinationLabel}`;
   const summaryTripTypeLabel = tripType === "one_way"
     ? t("summaryOneWay")
     : tripType === "round_trip"
@@ -3407,7 +3407,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
                   </div>
                   {selectedResult ? (
                     <div className="qs-explain-selected">
-                      <strong>{selectedResult.origin} {" -> "} {selectedResult.destination}</strong>
+                      <strong>{selectedResult.origin} {" → "} {selectedResult.destination}</strong>
                       <span>{t("score")}: {selectedResult.ranking_score ? formatScore(selectedResult.ranking_score) : "--"}</span>
                       <span>{t("riskAllowed")}: {formatRiskLabel(selectedResult.risk_label)}</span>
                       <span>{t("freshnessLabel")} {formatFreshness(selectedResult.freshness_ts)}</span>
@@ -3690,7 +3690,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
                       {compactView ? (
                         <>
                           <div className="qs-result-route">
-                            <strong>{r.origin}{" -> "}{r.destination}</strong>
+                            <strong>{r.origin}{" → "}{r.destination}</strong>
                             {(r.origin !== origin || r.destination !== destination) ? (
                               <span className="chip">{t("alternative")}</span>
                             ) : null}
@@ -3708,7 +3708,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
                         <>
                           <span className="qs-result-kicker">{t("resultsColRoute")}</span>
                           <div className="qs-result-route">
-                            <strong>{r.origin}{" -> "}{r.destination}</strong>
+                            <strong>{r.origin}{" → "}{r.destination}</strong>
                             {(r.origin !== origin || r.destination !== destination) ? (
                               <span className="chip">{t("alternative")}</span>
                             ) : null}
@@ -3868,7 +3868,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
                             <strong>{t("detailsLegs")}</strong>
                             {r.legs.map((leg, legIdx) => (
                               <div key={`${rowId}-leg-${legIdx}`} className="qs-leg-row">
-                                <span>{leg.origin_iata} {" -> "} {leg.destination_iata}</span>
+                                <span>{leg.origin_iata} {" → "} {leg.destination_iata}</span>
                                 <span>{new Date(leg.dep_ts).toLocaleTimeString(localeTag, { hour: "2-digit", minute: "2-digit" })}</span>
                                 <span>{new Date(leg.arr_ts).toLocaleTimeString(localeTag, { hour: "2-digit", minute: "2-digit" })}</span>
                               </div>
