@@ -317,7 +317,7 @@ export default function DashboardPage() {
             <div className="module-actions">
               <Link
                 href="/watchlist"
-                className="btn-primary"
+                className="btn-secondary"
                 onClick={() => trackEvent("dashboard_click_watchlist", { area: "dashboard", source: "watchlist_card" })}
               >
                 {t("dashboard.modules.watchlist.primary")}
@@ -342,7 +342,7 @@ export default function DashboardPage() {
             <div className="module-actions">
               <Link
                 href="/alerts"
-                className="btn-primary"
+                className="btn-secondary"
                 onClick={() => trackEvent("dashboard_alerts_open", { area: "dashboard", source: "alerts_card" })}
               >
                 {t("dashboard.modules.alerts.primary")}
@@ -390,7 +390,7 @@ export default function DashboardPage() {
           <div className="module-actions">
             <Link
               href="/recomendaciones"
-              className="btn-primary"
+              className="btn-secondary"
               onClick={() => trackEvent("dashboard_click_suggestions", { area: "dashboard", source: "opportunities_card" })}
             >
               {t("dashboard.opportunities.cta")}

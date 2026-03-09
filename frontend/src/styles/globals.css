@@ -2766,6 +2766,24 @@ h1 {
   gap: 1rem;
 }
 
+.alert-event-main {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.alert-event-side {
+  display: grid;
+  justify-items: end;
+  gap: 0.35rem;
+  min-width: 148px;
+}
+
+.alert-timestamp {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+
 .alert-message {
   margin-top: 0.35rem;
   font-size: 0.9rem;
@@ -2782,6 +2800,13 @@ h1 {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+@media (max-width: 740px) {
+  .alert-event-side {
+    width: 100%;
+    justify-items: start;
+  }
 }
 
 .history-summary--compact {
