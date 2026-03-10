@@ -77,9 +77,7 @@ export function QuickSearchStatePanels(props: Props) {
                 aria-expanded={props.emptyCausesExpanded}
                 onClick={props.onToggleEmptyCauses}
               >
-                {props.locale === "es"
-                  ? (props.emptyCausesExpanded ? "Ver menos" : "Ver más")
-                  : (props.emptyCausesExpanded ? "Show less" : "Show more")}
+                {props.emptyCausesExpanded ? props.t("emptyShowLess") : props.t("emptyShowMore")}
               </button>
             ) : null}
           </div>

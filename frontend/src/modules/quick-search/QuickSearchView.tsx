@@ -1780,8 +1780,8 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
       : undefined;
   const autocompleteLiveText = activeAutocompleteField
     ? activeSuggestions.length > 0
-      ? `${activeSuggestions.length} suggestions available`
-      : "No suggestions"
+      ? t("autocompleteSuggestionsAvailable").replace("{count}", String(activeSuggestions.length))
+      : t("autocompleteNoSuggestions")
     : "";
   const tripType = getTripTypeLabel(isReturn, returnDate);
   const radiusActive = includeNearbyOrigins || includeNearbyDestinations;
@@ -2077,10 +2077,10 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
     return Array.from(grouped.entries()).map(([message, count]) => ({ message, count }));
   }, [warningSeverity.critical]);
 
-  const warningDetailOpenLabel = locale === "es" ? "Ver detalles" : "View details";
-  const warningDetailCloseLabel = locale === "es" ? "Ocultar detalles" : "Hide details";
-  const warningGroupedTitle = locale === "es" ? "Avisos" : "Warnings";
-  const warningProblemTitle = locale === "es" ? "Problema" : "Problem";
+  const warningDetailOpenLabel = t("warningDetailsOpen");
+  const warningDetailCloseLabel = t("warningDetailsClose");
+  const warningGroupedTitle = t("warningsGroupedTitle");
+  const warningProblemTitle = t("warningProblemTitle");
   const infoItemsCount =
     (filtersMeta?.relaxed && filtersMeta.relaxed.length > 0 ? 1 : 0)
     + (warningSeverity.neutral.length > 0 ? 1 : 0)
@@ -2285,7 +2285,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
   ]);
   const visibleZeroResultCauses = emptyCausesExpanded ? zeroResultCauses : zeroResultCauses.slice(0, 3);
   const canExpandZeroResultCauses = zeroResultCauses.length > 3;
-  const emptyStateMainTitle = locale === "es" ? "0 resultados con estos filtros" : "0 results with these filters";
+  const emptyStateMainTitle = t("emptyStateMainTitle");
 
   const zeroResultActions = useMemo(() => {
     const actions: Array<{ id: ZeroResultRelaxAction; label: string }> = [];
@@ -2506,12 +2506,12 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
       {quickSearchHint.visible ? (
         <section className="notice notice-compact notice-info section-gap" role="status" aria-live="polite">
           <div>
-            <strong>Primer vistazo</strong>
-            <p>Aquí puedes buscar vuelos rápidamente.</p>
+            <strong>{t("quickLookTitle")}</strong>
+            <p>{t("quickLookBody")}</p>
           </div>
           <div className="notice-actions">
             <button type="button" className="btn-ghost btn-compact" onClick={quickSearchHint.dismiss}>
-              Entendido
+              {t("quickLookAcknowledge")}
             </button>
           </div>
         </section>
@@ -3141,7 +3141,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
 
       <section className="panel panel-soft qs-search-summary-compact section-gap-sm" aria-live="polite">
         <div className="panel-header">
-          <h3>{locale === "es" ? "Resumen de búsqueda" : "Search summary"}</h3>
+          <h3>{t("searchSummaryTitle")}</h3>
         </div>
         <div className="qs-summary-detail-row">
           <span className="qs-summary-chip">{summaryTrip}</span>
@@ -3153,10 +3153,10 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
 
       {pendingSearchChanges ? (
         <div className="notice notice-warning section-gap-sm qs-pending-changes" role="status" aria-live="polite">
-          <strong>{locale === "es" ? "Cambios sin aplicar" : "Unapplied changes"}</strong>
-          <span>{locale === "es" ? " Los resultados visibles corresponden a criterios anteriores." : " Results shown still match previous criteria."}</span>
+          <strong>{t("pendingChangesTitle")}</strong>
+          <span>{t("pendingChangesBody")}</span>
           <button type="button" className="btn-search" onClick={runSearch}>
-            {locale === "es" ? "Aplicar y buscar" : "Apply and search"}
+            {t("applyAndSearch")}
           </button>
         </div>
       ) : null}
@@ -3592,7 +3592,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
                       {t("sourcesLabel")}: {sourcesSummary.preview || `${t("sourceUnknown")} (0)`}
                     </span>
                     <span className="qs-sources-detail-link">
-                      {locale === "es" ? "Ver detalle" : "View detail"}
+                      {t("viewDetail")}
                     </span>
                   </summary>
                   <div className="panel panel-soft qs-sources-panel">
@@ -3611,7 +3611,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
             </div>
             {hasSearched && executedCriteria ? (
               <div className="qs-executed-criteria" aria-live="polite">
-                <strong>{locale === "es" ? "Criterios usados" : "Applied criteria"}:</strong>
+                <strong>{t("appliedCriteriaTitle")}:</strong>
                 <span>{executedCriteria.route}</span>
                 <span>{executedCriteria.dateLabel}</span>
                 <span>{executedCriteria.paxLabel}</span>
@@ -3623,7 +3623,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
             <div className="qs-results-controls">
               {pendingSearchChanges ? (
                 <button type="button" className="btn-search qs-apply-sticky" onClick={runSearch}>
-                  {locale === "es" ? "Aplicar y buscar" : "Apply and search"}
+                  {t("applyAndSearch")}
                 </button>
               ) : null}
               <label className="field">
