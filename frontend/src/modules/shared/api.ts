@@ -1,7 +1,27 @@
 import { translate } from "@/i18n";
 import { hasToken } from "@/modules/shared/auth";
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1").trim();
+const RAW_API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1").trim();
+
+function resolveApiBase(rawBase: string): string {
+  if (typeof window === "undefined") return rawBase;
+  try {
+    const parsed = new URL(rawBase);
+    const currentHost = window.location.hostname;
+    const isLocalApi = parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1";
+    const isCurrentLocal = currentHost === "localhost" || currentHost === "127.0.0.1";
+
+    if (isLocalApi && !isCurrentLocal) {
+      parsed.hostname = currentHost;
+      return parsed.toString().replace(/\/$/, "");
+    }
+  } catch {
+    return rawBase;
+  }
+  return rawBase;
+}
+
+const API_BASE = resolveApiBase(RAW_API_BASE);
 
 function authHeaders(): HeadersInit {
   if (typeof window === "undefined") {
