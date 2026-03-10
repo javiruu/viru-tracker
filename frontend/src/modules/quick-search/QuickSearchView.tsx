@@ -2250,7 +2250,6 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
   }, [activeChips]);
 
   const [relaxPreviewOpen, setRelaxPreviewOpen] = useState(false);
-  const [runAfterRelaxApply, setRunAfterRelaxApply] = useState(false);
 
   const durationMaxNumber = useMemo(() => parseNumericInput(durationMax, { min: 1 }), [durationMax]);
 
@@ -2327,25 +2326,27 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
     return rows;
   }, [strictFilters, riskFilter, priceMin, priceMax, t, formatRiskLabel]);
 
-  const openRelaxPreview = useCallback(() => {
+  const openRelaxPreview = () => {
     setRelaxPreviewOpen(true);
     trackEvent("relax_filters_preview_open", { changes_count: relaxPreviewChanges.length });
-  }, [relaxPreviewChanges.length]);
+  };
 
-  const cancelRelaxPreview = useCallback(() => {
+  const cancelRelaxPreview = () => {
     setRelaxPreviewOpen(false);
     trackEvent("relax_filters_cancelled", { changes_count: relaxPreviewChanges.length });
-  }, [relaxPreviewChanges.length]);
+  };
 
-  const applyRelaxPreview = useCallback(() => {
+  const applyRelaxPreview = () => {
     setStrictFilters(false);
     setRiskFilter("all");
     setPriceMin("");
     setPriceMax("");
     setRelaxPreviewOpen(false);
-    setRunAfterRelaxApply(true);
+    requestAnimationFrame(() => {
+      void onSubmit({ preventDefault: () => {} } as FormEvent);
+    });
     trackEvent("relax_filters_applied", { changes_count: relaxPreviewChanges.length });
-  }, [relaxPreviewChanges.length, setPriceMax, setPriceMin, setRiskFilter, setStrictFilters]);
+  };
 
   const undoZeroResultRelaxAction = useCallback((requestedAction?: ZeroResultRelaxAction) => {
     const undoPayload = relaxUndoRef.current;
@@ -2528,15 +2529,10 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
 
   const quickSearchHint = useFtueHint("quick_search");
 
-  const runSearch = useCallback(() => {
+  const runSearch = () => {
     void onSubmit({ preventDefault: () => {} } as FormEvent);
-  }, [onSubmit]);
+  };
 
-  useEffect(() => {
-    if (!runAfterRelaxApply) return;
-    runSearch();
-    setRunAfterRelaxApply(false);
-  }, [runAfterRelaxApply, runSearch]);
 
   return (
     <main className="shell quick-search-shell" id="main-content">
