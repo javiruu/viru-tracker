@@ -16,7 +16,7 @@ type Props = {
   departAfter: string;
   departBefore: string;
   localeTag: string;
-  fallbackPayload: string;
+  getCopyPayload: (result: SearchResult) => string;
   rowMenuTriggerRefs: React.MutableRefObject<Record<string, HTMLButtonElement | null>>;
   t: (key: any) => string;
   formatMoney: (value: number, currency?: string) => string;
@@ -163,7 +163,7 @@ function QuickSearchResultsListInner(props: Props) {
                             className="qs-row-menu-item"
                             onClick={() => {
                               props.onTrackCopyParams(rowId);
-                              props.setCopyModalPayload(props.fallbackPayload);
+                              props.setCopyModalPayload(props.getCopyPayload(r));
                               props.setCopyModalOpen(true);
                               props.setOpenRowMenuId(null);
                             }}

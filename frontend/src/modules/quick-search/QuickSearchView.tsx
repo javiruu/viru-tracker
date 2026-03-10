@@ -76,6 +76,26 @@ type ExecutedCriteriaSnapshot = {
   filters: string[];
 };
 
+type NumericParseOptions = {
+  allowFloat?: boolean;
+  min?: number;
+  max?: number;
+};
+
+function parseNumericInput(raw: string, options: NumericParseOptions = {}): number | null {
+  const value = raw.trim();
+  if (!value) return null;
+  const normalized = value.replace(",", ".");
+  const pattern = options.allowFloat ? /^\d+(\.\d+)?$/ : /^\d+$/;
+  if (!pattern.test(normalized)) return null;
+  const parsed = Number(normalized);
+  if (!Number.isFinite(parsed)) return null;
+  if (!options.allowFloat && !Number.isInteger(parsed)) return null;
+  if (options.min !== undefined && parsed < options.min) return null;
+  if (options.max !== undefined && parsed > options.max) return null;
+  return parsed;
+}
+
 const AIRPORTS = airportsIata as Array<{ 
   iata: string;
   name: string;
@@ -1031,22 +1051,25 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
     };
     setMessage("");
     setMessageType("error");
-    setWeatherMessage("");
-    setWeatherOrigin(null);
-    setWeatherDestination(null);
-    setFiltersNotice([]);
-    setFiltersMeta(null);
-    setSearchMeta(null);
-    setJobId(null);
-    setIsDegraded(false);
-    setSearchState("loading");
-    setLoadingVisualHold(false);
-    setDisplayProgress(0);
-    setProgress("requesting", 30);
     setSearchError(null);
     setFieldErrors({});
+
+    const nextFieldErrors: QuickSearchFieldErrors = {};
     const originHasValue = Boolean(origin.trim()) || Boolean(originCountryOnly);
     const destinationHasValue = Boolean(destination.trim()) || Boolean(destinationCountryOnly);
+    const parsedPriceMin = parseNumericInput(priceMin, { min: 0 });
+    const parsedPriceMax = parseNumericInput(priceMax, { min: 0 });
+    const parsedDurationMax = parseNumericInput(durationMax, { min: 1 });
+    const parsedBufferMin = parseNumericInput(bufferMin, { min: 0 });
+
+    if (priceMin.trim() && parsedPriceMin === null) nextFieldErrors.price_min = t("errorText");
+    if (priceMax.trim() && parsedPriceMax === null) nextFieldErrors.price_max = t("errorText");
+    if (durationMax.trim() && parsedDurationMax === null) nextFieldErrors.duration_max = t("errorText");
+    if (bufferMin.trim() && parsedBufferMin === null) nextFieldErrors.buffer_min = t("errorText");
+    if (parsedPriceMin !== null && parsedPriceMax !== null && parsedPriceMin > parsedPriceMax) {
+      nextFieldErrors.price_max = t("errorText");
+    }
+
     if (!originHasValue && !destinationHasValue) {
       onEmptySearchValidation();
       return;
@@ -1079,7 +1102,26 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
       setSearchError(t("returnBefore"));
       return;
     }
+    if (Object.keys(nextFieldErrors).length > 0) {
+      setSearchState("error");
+      setSearchError(t("errorText"));
+      setFieldErrors(nextFieldErrors);
+      return;
+    }
+
     setAppliedCriteriaSignature(currentCriteriaSignature);
+    setWeatherMessage("");
+    setWeatherOrigin(null);
+    setWeatherDestination(null);
+    setFiltersNotice([]);
+    setFiltersMeta(null);
+    setSearchMeta(null);
+    setJobId(null);
+    setIsDegraded(false);
+    setSearchState("loading");
+    setLoadingVisualHold(false);
+    setDisplayProgress(0);
+    setProgress("requesting", 30);
     const nextExcludeOrigins = [...excludeOrigins];
     const nextExcludeDestinations = [...excludeDestinations];
     parseIataList(excludeOriginInput).forEach((value) => {
@@ -1106,6 +1148,10 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
       include_nearby_destinations: includeNearbyDestinations,
       depart_after: departAfter || undefined,
       depart_before: departBefore || undefined,
+      price_min: parsedPriceMin ?? undefined,
+      price_max: parsedPriceMax ?? undefined,
+      duration_max_min: parsedDurationMax ?? undefined,
+      buffer_min: parsedBufferMin ?? undefined,
       max_stops: includeStops ? maxStops : 0,
       exclude_origins: nextExcludeOrigins,
       exclude_destinations: nextExcludeDestinations,
@@ -1930,7 +1976,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
       };
     });
   }, [loadingSubcheckRoutes, loadingSubcheckActiveIndex, t]);
-  const summaryDurationValue = durationMax ? Number(durationMax) : null;
+  const summaryDurationValue = parseNumericInput(durationMax, { min: 1 });
   const summaryDuration = summaryDurationValue !== null && Number.isFinite(summaryDurationValue)
     ? `${t("summaryDurationMax")} ${summaryDurationValue} min`
     : t("summaryDurationOpen");
@@ -1950,9 +1996,9 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
   const deeplinkUrl = deepLink?.url || deepLink?.fallback_url || localRyanairUrl;
   const normalizedResults = useMemo(() => normalizeQuickSearchResults(results), [results]);
   const { visibleResults, hiddenHighRiskResults } = useMemo(() => {
-    const min = priceMin ? Number(priceMin) : null;
-    const max = priceMax ? Number(priceMax) : null;
-    const durMax = durationMax ? Number(durationMax) : null;
+    const min = parseNumericInput(priceMin, { min: 0 });
+    const max = parseNumericInput(priceMax, { min: 0 });
+    const durMax = parseNumericInput(durationMax, { min: 1 });
     let list = normalizedResults.filter((item) => {
       if (riskFilter !== "all" && item.risk_label !== riskFilter) {
         if (riskFilter !== "high" && item.risk_label === "high") return true;
@@ -2202,10 +2248,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
     activeChips.forEach((chip) => chip.onClear());
   }, [activeChips]);
 
-  const durationMaxNumber = useMemo(() => {
-    const parsed = Number(durationMax);
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
-  }, [durationMax]);
+  const durationMaxNumber = useMemo(() => parseNumericInput(durationMax, { min: 1 }), [durationMax]);
 
   const timeWindowMinutes = useMemo(() => {
     const parseMinutes = (value: string) => {
@@ -2382,25 +2425,25 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
     );
   }, [visibleResults, selectedResultId]);
 
-  const fallbackPayload = useMemo(() => {
+  const getCopyPayload = useCallback((result: SearchResult) => {
     return JSON.stringify(
       {
-        origin_iata: origin,
-        destination_iata: destination,
-        date: travelDate,
+        origin_iata: result.origin || origin,
+        destination_iata: result.destination || destination,
+        date: result.travel_date || travelDate,
         flex_days_before: daysBefore,
         flex_days_after: daysAfter,
         radius_km: radiusActive ? radiusKm : 0,
         include_nearby_origin: includeNearbyOrigins,
         include_nearby_destination: includeNearbyDestinations,
-        price_min: priceMin ? Number(priceMin) : undefined,
-        price_max: priceMax ? Number(priceMax) : undefined,
+        price_min: parseNumericInput(priceMin, { min: 0 }) ?? undefined,
+        price_max: parseNumericInput(priceMax, { min: 0 }) ?? undefined,
         departure_from: departAfter || undefined,
         departure_to: departBefore || undefined,
-        duration_max_min: durationMax ? Number(durationMax) : undefined,
+        duration_max_min: parseNumericInput(durationMax, { min: 1 }) ?? undefined,
         include_stops: includeStops,
         max_stops: includeStops ? maxStops : 0,
-        risk_allowed: riskFilter,
+        risk_allowed: result.risk_label || riskFilter,
         exclude_origins: excludeOrigins,
         exclude_destinations: excludeDestinations,
         strict_mode: strictFilters,
@@ -2408,7 +2451,8 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
         return_date: isReturn ? returnDate : undefined,
         adults,
         flex_apply_return: isReturn ? applyFlexReturn : undefined,
-        buffer_min: bufferMin ? Number(bufferMin) : undefined,
+        buffer_min: parseNumericInput(bufferMin, { min: 0 }) ?? undefined,
+        result_id: result.result_id ?? undefined,
       },
       null,
       2,
@@ -3025,7 +3069,8 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
             </label>
             <label className="field">
               {t("durationMax")}
-              <input className="qs-input" type="number" min={0} value={durationMax} onChange={(e) => setDurationMax(e.target.value)} placeholder="240" />
+              <input className="qs-input" type="number" min={1} step={1} value={durationMax} onChange={(e) => setDurationMax(e.target.value)} placeholder="240" aria-invalid={Boolean(fieldErrors.duration_max)} />
+              {fieldErrors.duration_max ? <small className="qs-error">{fieldErrors.duration_max}</small> : null}
             </label>
             <label className="field">
               {t("riskAllowed")}
@@ -3159,35 +3204,50 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
                 <label className="field">
                   {t("priceMin")}
                   <input
+                    type="number"
+                    min={0}
+                    step={1}
                     name="price_min"
                     autoComplete="off"
                     value={priceMin}
                     onChange={(e) => setPriceMin(e.target.value)}
                     placeholder="10"
                     className="qs-input"
+                    aria-invalid={Boolean(fieldErrors.price_min)}
                   />
+                  {fieldErrors.price_min ? <small className="qs-error">{fieldErrors.price_min}</small> : null}
                 </label>
                 <label className="field">
                   {t("durationMax")}
                   <input
+                    type="number"
+                    min={1}
+                    step={1}
                     name="duration_max"
                     autoComplete="off"
                     value={durationMax}
                     onChange={(e) => setDurationMax(e.target.value)}
                     placeholder="240"
                     className="qs-input"
+                    aria-invalid={Boolean(fieldErrors.duration_max)}
                   />
+                  {fieldErrors.duration_max ? <small className="qs-error">{fieldErrors.duration_max}</small> : null}
                 </label>
                 <label className="field">
                   {t("priceMax")}
                   <input
+                    type="number"
+                    min={0}
+                    step={1}
                     name="price_max"
                     autoComplete="off"
                     value={priceMax}
                     onChange={(e) => setPriceMax(e.target.value)}
                     placeholder="120"
                     className="qs-input"
+                    aria-invalid={Boolean(fieldErrors.price_max)}
                   />
+                  {fieldErrors.price_max ? <small className="qs-error">{fieldErrors.price_max}</small> : null}
                 </label>
               </div>
             </div>
@@ -3393,6 +3453,9 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
                 <label className="field">
                   {t("bufferMin")}
                   <input
+                    type="number"
+                    min={0}
+                    step={1}
                     name="buffer_min"
                     autoComplete="off"
                     value={bufferMin}
@@ -3400,7 +3463,9 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
                     placeholder="45"
                     className="qs-input"
                     disabled={!includeStops}
+                    aria-invalid={Boolean(fieldErrors.buffer_min)}
                   />
+                  {fieldErrors.buffer_min ? <small className="qs-error">{fieldErrors.buffer_min}</small> : null}
                   <small className="muted">{t("bufferMinHint")}</small>
                 </label>
                 <div className="field">
@@ -3764,7 +3829,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
             departAfter={departAfter}
             departBefore={departBefore}
             localeTag={localeTag}
-            fallbackPayload={fallbackPayload}
+            getCopyPayload={getCopyPayload}
             rowMenuTriggerRefs={rowMenuTriggerRefs}
             t={t}
             formatMoney={formatMoney}

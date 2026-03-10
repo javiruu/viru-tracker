@@ -103,7 +103,14 @@ export type RegionPref = {
   currency: string;
 };
 
-export type QuickSearchField = "origin_iata" | "destination_iata" | "travel_date";
+export type QuickSearchField =
+  | "origin_iata"
+  | "destination_iata"
+  | "travel_date"
+  | "price_min"
+  | "price_max"
+  | "duration_max"
+  | "buffer_min";
 export type QuickSearchFieldErrors = Partial<Record<QuickSearchField, string>>;
 export type QuickSearchAutocompleteField = "origin" | "destination";
 export type QuickSearchMode = "quick-search" | "recommendations";
