@@ -2083,6 +2083,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
   const warningProblemTitle = t("warningProblemTitle");
   const infoItemsCount =
     (filtersMeta?.relaxed && filtersMeta.relaxed.length > 0 ? 1 : 0)
+    + (warningSeverity.critical.length > 0 ? 1 : 0)
     + (warningSeverity.neutral.length > 0 ? 1 : 0)
     + (showDegradedState ? 1 : 0)
     + (weatherMessage ? 1 : 0)
@@ -3579,35 +3580,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
                   )}
                 </span>
               ) : null}
-              {sourcesSummary.entries.length > 0 ? (
-                <details
-                  className="qs-sources-popover"
-                  onToggle={(event) => {
-                    if (!event.currentTarget.open) return;
-                    trackEvent("quicksearch_sources_detail_opened", { sources_count: sourcesSummary.entries.length });
-                  }}
-                >
-                  <summary className="qs-sources-trigger" aria-label={t("sourcesDetailAria")}>
-                    <span>
-                      {t("sourcesLabel")}: {sourcesSummary.preview || `${t("sourceUnknown")} (0)`}
-                    </span>
-                    <span className="qs-sources-detail-link">
-                      {t("viewDetail")}
-                    </span>
-                  </summary>
-                  <div className="panel panel-soft qs-sources-panel">
-                    <strong>{t("sourcesDetailTitle")}</strong>
-                    <ul>
-                      {sourcesSummary.entries.map(([source, count]) => (
-                        <li key={`${source}-${count}`}>
-                          <span>{source}</span>
-                          <strong>{count}</strong>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </details>
-              ) : null}
+
             </div>
             {hasSearched && executedCriteria ? (
               <div className="qs-executed-criteria" aria-live="polite">
@@ -3779,42 +3752,6 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
             }}
             t={t}
           />
-          {warningSeverity.critical.length > 0 ? (
-            <div className="notice notice-compact notice-error qs-warning-grouped qs-warning-grouped-critical">
-              <div className="qs-warning-grouped-head">
-                <strong>{warningProblemTitle}</strong>
-                <span className="qs-warning-grouped-count">{warningSeverity.critical.length}</span>
-                <button
-                  type="button"
-                  className="btn-ghost btn-compact"
-                  aria-expanded={criticalWarningsExpanded}
-                  aria-controls="qs-warning-critical-details"
-                  onClick={() => setCriticalWarningsExpanded((prev) => !prev)}
-                >
-                  {criticalWarningsExpanded ? warningDetailCloseLabel : warningDetailOpenLabel}
-                </button>
-              </div>
-              {groupedCriticalWarnings.length > 0 ? (
-                <div className="qs-warning-grouped-summary" aria-live="polite">
-                  {groupedCriticalWarnings.map((group) => (
-                    <span key={group.message} className="qs-warning-group-chip">
-                      {group.message} ({group.count})
-                    </span>
-                  ))}
-                </div>
-              ) : null}
-              {criticalWarningsExpanded ? (
-                <div id="qs-warning-critical-details" className="qs-warning-grouped-details">
-                  <ul>
-                    {warningSeverity.critical.map((notice, idx) => (
-                      <li key={`${notice}-${idx}`}>{notice}</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-            </div>
-          ) : null}
-
           <QuickSearchResultsList
             visibleResults={visibleResults}
             compactView={compactView}
@@ -3868,10 +3805,70 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
               <span className="qs-info-count">{infoItemsCount}</span>
             </summary>
             <div className="qs-info-body">
+              {warningSeverity.critical.length > 0 ? (
+                <div className="notice notice-compact notice-error qs-warning-grouped qs-warning-grouped-critical">
+                  <div className="qs-warning-grouped-head">
+                    <strong>{warningProblemTitle}</strong>
+                    <span className="qs-warning-grouped-count">{warningSeverity.critical.length}</span>
+                    <button
+                      type="button"
+                      className="btn-ghost btn-compact"
+                      aria-expanded={criticalWarningsExpanded}
+                      aria-controls="qs-warning-critical-details"
+                      onClick={() => setCriticalWarningsExpanded((prev) => !prev)}
+                    >
+                      {criticalWarningsExpanded ? warningDetailCloseLabel : warningDetailOpenLabel}
+                    </button>
+                  </div>
+                  {groupedCriticalWarnings.length > 0 ? (
+                    <div className="qs-warning-grouped-summary" aria-live="polite">
+                      {groupedCriticalWarnings.map((group) => (
+                        <span key={group.message} className="qs-warning-group-chip">
+                          {group.message} ({group.count})
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                  {criticalWarningsExpanded ? (
+                    <div id="qs-warning-critical-details" className="qs-warning-grouped-details">
+                      <ul>
+                        {warningSeverity.critical.map((notice, idx) => (
+                          <li key={`${notice}-${idx}`}>{notice}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
               {filtersMeta?.relaxed && filtersMeta.relaxed.length > 0 ? (
                 <div className="notice notice-compact notice-success">
                   {t("filtersRelaxed")}: {filtersMeta.relaxed.join(", ")}.
                 </div>
+              ) : null}
+              {sourcesSummary.entries.length > 0 ? (
+                <details
+                  className="qs-sources-popover"
+                  onToggle={(event) => {
+                    if (!event.currentTarget.open) return;
+                    trackEvent("quicksearch_sources_detail_opened", { sources_count: sourcesSummary.entries.length });
+                  }}
+                >
+                  <summary className="qs-sources-trigger" aria-label={t("sourcesDetailAria")}>
+                    <span>{t("sourcesLabel")}: {sourcesSummary.preview || `${t("sourceUnknown")} (0)`}</span>
+                    <span className="qs-sources-detail-link">{t("viewDetail")}</span>
+                  </summary>
+                  <div className="panel panel-soft qs-sources-panel">
+                    <strong>{t("sourcesDetailTitle")}</strong>
+                    <ul>
+                      {sourcesSummary.entries.map(([source, count]) => (
+                        <li key={`${source}-${count}`}>
+                          <span>{source}</span>
+                          <strong>{count}</strong>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </details>
               ) : null}
               {warningSeverity.neutral.length > 0 ? (
                 <div className="notice notice-compact notice-info qs-warning-grouped qs-warning-grouped-neutral">
@@ -4062,7 +4059,11 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
       ) : null}
 
       {(weatherOrigin || weatherDestination) ? (
-        <section className="panel panel-soft section-gap">
+        <details className="panel panel-soft section-gap qs-secondary-weather">
+          <summary className="qs-info-summary">
+            <strong>{t("weatherTitle")}</strong>
+            <span className="muted">{t("viewDetail")}</span>
+          </summary>
           <div className="panel-header">
             <h2>{t("weatherTitle")}</h2>
             <span className="muted">{t("weatherSubtitle")}</span>
@@ -4143,7 +4144,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
               </div>
             ) : null}
           </div>
-        </section>
+        </details>
       ) : null}
 
     </main>
