@@ -2,6 +2,7 @@
 
 import { formatCurrency, formatRelativeTime } from "@/modules/shared/format";
 import { monthDays, toIsoMonth } from "@/modules/watchlist/dateUtils";
+import { formatDateTime } from "@/modules/watchlist/presentation";
 import type { HistoryRow, HoverPoint, ListSort, RangeWindow, Watch } from "@/modules/watchlist/types";
 
 type WatchMetaEntry = {

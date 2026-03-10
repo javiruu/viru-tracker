@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { trackUxEvent } from "@/lib/uxTracking";
 import { apiFetch } from "@/modules/shared/api";
-import { formatCurrency } from "@/modules/shared/format";
+import { formatCurrency, formatRelativeTime } from "@/modules/shared/format";
 import { useI18n } from "@/i18n";
 
 type Watch = {

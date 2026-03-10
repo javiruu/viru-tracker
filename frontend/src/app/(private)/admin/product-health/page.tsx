@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { apiFetch } from "@/modules/shared/api";
-import { useAuthContext } from "@/modules/shared/auth";
+
+type Me = { id: string; email: string; locale: string; is_admin: boolean };
 
 type ProductHealth = {
   usage: Record<string, { daily: number; weekly: number; trend: string }>;
@@ -39,27 +40,24 @@ function statusLabel(status: ProductHealth["system"]["status"]): string {
 
 export default function ProductHealthPage() {
   const router = useRouter();
-  const { token, ready, isAdmin } = useAuthContext();
+  const [me, setMe] = useState<Me | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [data, setData] = useState<ProductHealth | null>(null);
 
   useEffect(() => {
-    if (!ready) return;
-    if (!token) {
-      router.replace("/login?next=/admin/product-health");
-      return;
-    }
-    if (!isAdmin) {
-      router.replace("/dashboard");
-      return;
-    }
-
     let active = true;
     async function load() {
       setLoading(true);
       setError("");
       try {
+        const meData = await apiFetch<Me>("/auth/me");
+        if (!active) return;
+        setMe(meData);
+        if (!meData.is_admin) {
+          router.replace("/dashboard");
+          return;
+        }
         const payload = await apiFetch<ProductHealth>("/admin/product-health");
         if (active) setData(payload);
       } catch {
@@ -72,9 +70,9 @@ export default function ProductHealthPage() {
     return () => {
       active = false;
     };
-  }, [ready, token, isAdmin, router]);
+  }, [router]);
 
-  if (!ready || loading) {
+  if (!me?.is_admin || loading) {
     return <main className="shell"><div className="notice notice-info">Cargando Product Health...</div></main>;
   }
 

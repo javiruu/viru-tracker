@@ -1178,7 +1178,6 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
           setHasSearched(true);
           const isEmptyResult = data.results.length === 0;
           setSearchState(isEmptyResult ? "empty" : "success");
-          setLastSearchAt(new Date().toISOString());
           const durationMs = Math.round((typeof performance !== "undefined" ? performance.now() : Date.now()) - startedAt);
           void trackUxEvent("quick_search_executed", { duration_ms: durationMs, result_count: data.results.length });
           if (isEmptyResult) {
