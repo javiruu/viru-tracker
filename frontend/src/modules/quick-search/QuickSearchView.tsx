@@ -131,6 +131,7 @@ function buildAirportSuggestions(value: string, limit = 6) {
 export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchMode }) {
   const router = useRouter();
   const [executedCriteria, setExecutedCriteria] = useState<ExecutedCriteriaSnapshot | null>(null);
+  const [appliedCriteriaSignature, setAppliedCriteriaSignature] = useState<string | null>(null);
   const initialOrigin = mode === "recommendations" ? "" : "MAD";
   const initialDestination = mode === "recommendations" ? "" : "DUB";
   const {
@@ -1030,8 +1031,6 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
     };
     setMessage("");
     setMessageType("error");
-    setResults([]);
-    setHasSearched(false);
     setWeatherMessage("");
     setWeatherOrigin(null);
     setWeatherDestination(null);
@@ -1080,6 +1079,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
       setSearchError(t("returnBefore"));
       return;
     }
+    setAppliedCriteriaSignature(currentCriteriaSignature);
     const nextExcludeOrigins = [...excludeOrigins];
     const nextExcludeDestinations = [...excludeDestinations];
     parseIataList(excludeOriginInput).forEach((value) => {
@@ -1120,12 +1120,12 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
     if (nextExcludeOrigins.length || nextExcludeDestinations.length) {
       snapshotFilters.push(`${t("summaryExclusions")}: ${nextExcludeOrigins.length + nextExcludeDestinations.length}`);
     }
-    setExecutedCriteria({
+    const nextExecutedCriteria: ExecutedCriteriaSnapshot = {
       route: `${originCountryOnly ? originCountryOnly.name : origin} → ${destinationCountryOnly ? destinationCountryOnly.name : destination}`,
       dateLabel: isReturn && returnDate ? `${travelDate} → ${returnDate}` : travelDate,
       paxLabel: `${adults} ${adults === 1 ? t("summaryPassengersSingular") : t("summaryPassengersPlural")}`,
       filters: snapshotFilters,
-    });
+    };
     trackEvent("quicksearch_search_submitted", {
       has_origin_country_scope: Boolean(originCountryOnly),
       has_destination_country_scope: Boolean(destinationCountryOnly),
@@ -1167,6 +1167,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
       if (searchResult.ok) {
           const data = searchResult.data;
           setResults(data.results);
+          setExecutedCriteria(nextExecutedCriteria);
           setFiltersMeta(data.filters || null);
           setSearchMeta(data.meta || null);
           setJobId(data.job_id || null);
@@ -1740,6 +1741,67 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
   const radiusActive = includeNearbyOrigins || includeNearbyDestinations;
   const hasInvalidRoute = !originValid || !destinationValid;
   const routeInputsValid = originValid && destinationValid;
+  const currentCriteriaSignature = useMemo(() => JSON.stringify({
+    origin,
+    destination,
+    originCountryOnly: originCountryOnly?.code ?? null,
+    destinationCountryOnly: destinationCountryOnly?.code ?? null,
+    travelDate,
+    returnDate,
+    isReturn,
+    adults,
+    daysBefore,
+    daysAfter,
+    applyFlexReturn,
+    includeStops,
+    maxStops,
+    durationMax,
+    riskFilter,
+    radiusKm,
+    includeNearbyOrigins,
+    includeNearbyDestinations,
+    excludeOrigins,
+    excludeDestinations,
+    excludeOriginInput,
+    excludeDestinationInput,
+    strictFilters,
+    priceMin,
+    priceMax,
+    departAfter,
+    departBefore,
+    bufferMin,
+  }), [
+    origin,
+    destination,
+    originCountryOnly,
+    destinationCountryOnly,
+    travelDate,
+    returnDate,
+    isReturn,
+    adults,
+    daysBefore,
+    daysAfter,
+    applyFlexReturn,
+    includeStops,
+    maxStops,
+    durationMax,
+    riskFilter,
+    radiusKm,
+    includeNearbyOrigins,
+    includeNearbyDestinations,
+    excludeOrigins,
+    excludeDestinations,
+    excludeOriginInput,
+    excludeDestinationInput,
+    strictFilters,
+    priceMin,
+    priceMax,
+    departAfter,
+    departBefore,
+    bufferMin,
+  ]);
+  const pendingSearchChanges = Boolean(hasSearched && appliedCriteriaSignature && currentCriteriaSignature !== appliedCriteriaSignature);
+
   const searchDisabledHint = !routeInputsValid
     ? t("searchHintRouteInvalid")
     : tripType === "round_trip_incomplete"
@@ -3044,6 +3106,16 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
         </div>
       </section>
 
+      {pendingSearchChanges ? (
+        <div className="notice notice-warning section-gap-sm qs-pending-changes" role="status" aria-live="polite">
+          <strong>{locale === "es" ? "Cambios sin aplicar" : "Unapplied changes"}</strong>
+          <span>{locale === "es" ? " Los resultados visibles corresponden a criterios anteriores." : " Results shown still match previous criteria."}</span>
+          <button type="button" className="btn-search" onClick={runSearch}>
+            {locale === "es" ? "Aplicar y buscar" : "Apply and search"}
+          </button>
+        </div>
+      ) : null}
+
       <div id="qs-workspace-hint" className="qs-workspace-hint">
         {pageWorkspaceHint}
       </div>
@@ -3484,6 +3556,11 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
               </div>
             ) : null}
             <div className="qs-results-controls">
+              {pendingSearchChanges ? (
+                <button type="button" className="btn-search qs-apply-sticky" onClick={runSearch}>
+                  {locale === "es" ? "Aplicar y buscar" : "Apply and search"}
+                </button>
+              ) : null}
               <label className="field">
                 {t("orderBy")}
                 <select
