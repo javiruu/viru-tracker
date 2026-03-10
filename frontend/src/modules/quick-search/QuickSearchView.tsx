@@ -2249,6 +2249,9 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
     activeChips.forEach((chip) => chip.onClear());
   }, [activeChips]);
 
+  const [relaxPreviewOpen, setRelaxPreviewOpen] = useState(false);
+  const [runAfterRelaxApply, setRunAfterRelaxApply] = useState(false);
+
   const durationMaxNumber = useMemo(() => parseNumericInput(durationMax, { min: 1 }), [durationMax]);
 
   const timeWindowMinutes = useMemo(() => {
@@ -2306,6 +2309,43 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
     excludeDestinations.length,
     t,
   ]);
+
+  const relaxPreviewChanges = useMemo(() => {
+    const rows: Array<{ id: string; label: string; before: string; after: string }> = [];
+    if (strictFilters) {
+      rows.push({ id: "strict", label: t("strictMode"), before: t("summaryStrictOn"), after: t("summaryStrictOff") });
+    }
+    if (riskFilter !== "all") {
+      rows.push({ id: "risk", label: t("riskAllowed"), before: formatRiskLabel(riskFilter), after: t("riskAll") });
+    }
+    if (priceMin) {
+      rows.push({ id: "priceMin", label: t("priceMin"), before: priceMin, after: "—" });
+    }
+    if (priceMax) {
+      rows.push({ id: "priceMax", label: t("priceMax"), before: priceMax, after: "—" });
+    }
+    return rows;
+  }, [strictFilters, riskFilter, priceMin, priceMax, t, formatRiskLabel]);
+
+  const openRelaxPreview = useCallback(() => {
+    setRelaxPreviewOpen(true);
+    trackEvent("relax_filters_preview_open", { changes_count: relaxPreviewChanges.length });
+  }, [relaxPreviewChanges.length]);
+
+  const cancelRelaxPreview = useCallback(() => {
+    setRelaxPreviewOpen(false);
+    trackEvent("relax_filters_cancelled", { changes_count: relaxPreviewChanges.length });
+  }, [relaxPreviewChanges.length]);
+
+  const applyRelaxPreview = useCallback(() => {
+    setStrictFilters(false);
+    setRiskFilter("all");
+    setPriceMin("");
+    setPriceMax("");
+    setRelaxPreviewOpen(false);
+    setRunAfterRelaxApply(true);
+    trackEvent("relax_filters_applied", { changes_count: relaxPreviewChanges.length });
+  }, [relaxPreviewChanges.length, setPriceMax, setPriceMin, setRiskFilter, setStrictFilters]);
 
   const undoZeroResultRelaxAction = useCallback((requestedAction?: ZeroResultRelaxAction) => {
     const undoPayload = relaxUndoRef.current;
@@ -2488,9 +2528,15 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
 
   const quickSearchHint = useFtueHint("quick_search");
 
-  const runSearch = () => {
+  const runSearch = useCallback(() => {
     void onSubmit({ preventDefault: () => {} } as FormEvent);
-  };
+  }, [onSubmit]);
+
+  useEffect(() => {
+    if (!runAfterRelaxApply) return;
+    runSearch();
+    setRunAfterRelaxApply(false);
+  }, [runAfterRelaxApply, runSearch]);
 
   return (
     <main className="shell quick-search-shell" id="main-content">
@@ -3730,6 +3776,30 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
             loadingTitle={t("loadingTitle")}
             loadingText={t("loadingText")}
           />
+          {relaxPreviewOpen ? (
+            <section className="panel panel-soft section-gap-sm" aria-live="polite">
+              <div className="panel-header">
+                <h3>{t("relaxPreviewTitle")}</h3>
+                <span className="muted">{t("relaxPreviewImpact")}</span>
+              </div>
+              <div className="qs-summary-detail-row">
+                {relaxPreviewChanges.length > 0 ? (
+                  relaxPreviewChanges.map((item) => (
+                    <span key={item.id} className="qs-summary-chip">
+                      {item.label}: {item.before} → {item.after}
+                    </span>
+                  ))
+                ) : (
+                  <span className="muted">{t("relaxPreviewNoChanges")}</span>
+                )}
+              </div>
+              <div className="qs-results-controls">
+                <button type="button" className="btn-search" onClick={applyRelaxPreview}>{t("relaxPreviewConfirm")}</button>
+                <button type="button" className="btn-ghost" onClick={cancelRelaxPreview}>{t("relaxPreviewCancel")}</button>
+              </div>
+            </section>
+          ) : null}
+
           <QuickSearchStatePanels
             searchState={searchState}
             rateLimitSeconds={rateLimitSeconds}
@@ -3744,12 +3814,7 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
             onToggleEmptyCauses={() => setEmptyCausesExpanded((prev) => !prev)}
             onRelaxAction={onZeroResultRelaxAction}
             onRunSearch={runSearch}
-            onEmptyCta={() => {
-              setStrictFilters(false);
-              setRiskFilter("all");
-              setPriceMin("");
-              setPriceMax("");
-            }}
+            onEmptyCta={openRelaxPreview}
             t={t}
           />
           <QuickSearchResultsList
