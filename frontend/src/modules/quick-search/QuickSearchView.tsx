@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { FormEvent, useCallback, useEffect, useMemo } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
@@ -69,7 +69,14 @@ const IATA_TO_MAC: Record<string, string> = {
 };
 const EMPTY_SEARCH_VALIDATION_MESSAGE = "Please enter a search";
 
-const AIRPORTS = airportsIata as Array<{
+type ExecutedCriteriaSnapshot = {
+  route: string;
+  dateLabel: string;
+  paxLabel: string;
+  filters: string[];
+};
+
+const AIRPORTS = airportsIata as Array<{ 
   iata: string;
   name: string;
   municipality: string;
@@ -123,6 +130,7 @@ function buildAirportSuggestions(value: string, limit = 6) {
 
 export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchMode }) {
   const router = useRouter();
+  const [executedCriteria, setExecutedCriteria] = useState<ExecutedCriteriaSnapshot | null>(null);
   const initialOrigin = mode === "recommendations" ? "" : "MAD";
   const initialDestination = mode === "recommendations" ? "" : "DUB";
   const {
@@ -1104,6 +1112,20 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
       strict_filters: strictFilters,
       soft_filters_weight: 0.6,
     };
+    const snapshotFilters: string[] = [];
+    if (includeStops) snapshotFilters.push(`${t("maxStops")}: ${maxStops}`);
+    if (durationMax) snapshotFilters.push(`${t("durationMax")}: ${durationMax}`);
+    if (riskFilter !== "all") snapshotFilters.push(`${t("riskAllowed")}: ${formatRiskLabel(riskFilter)}`);
+    if (radiusActive) snapshotFilters.push(`${t("summaryRadius")}: ${radiusKm} km`);
+    if (nextExcludeOrigins.length || nextExcludeDestinations.length) {
+      snapshotFilters.push(`${t("summaryExclusions")}: ${nextExcludeOrigins.length + nextExcludeDestinations.length}`);
+    }
+    setExecutedCriteria({
+      route: `${originCountryOnly ? originCountryOnly.name : origin} → ${destinationCountryOnly ? destinationCountryOnly.name : destination}`,
+      dateLabel: isReturn && returnDate ? `${travelDate} → ${returnDate}` : travelDate,
+      paxLabel: `${adults} ${adults === 1 ? t("summaryPassengersSingular") : t("summaryPassengersPlural")}`,
+      filters: snapshotFilters,
+    });
     trackEvent("quicksearch_search_submitted", {
       has_origin_country_scope: Boolean(originCountryOnly),
       has_destination_country_scope: Boolean(destinationCountryOnly),
@@ -2915,6 +2937,51 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
           </div>
         </div>
 
+        <section className="panel panel-soft qs-setup-critical-filters">
+          <div className="panel-header">
+            <h3>{t("filtersTitle")}</h3>
+            <button type="button" className="btn-ghost btn-compact" onClick={() => setIsFiltersOpen(true)}>
+              {t("toolbarFilters")}
+            </button>
+          </div>
+          <div className="qs-filter-grid">
+            <label className="qs-check">
+              <input
+                type="checkbox"
+                name="include_stops_quick"
+                checked={includeStops}
+                onChange={(e) => setIncludeStops(e.target.checked)}
+              />
+              <span className="qs-check-ui" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5.5 12.5 10 17l8.5-9" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg></span>
+              {t("includeStops")}
+            </label>
+            <label className="field">
+              {t("maxStops")}
+              <select value={maxStops} onChange={(e) => setMaxStops(Number(e.target.value))} className="qs-input" disabled={!includeStops}>
+                <option value={1}>{t("stopsOne")}</option>
+                <option value={2}>{t("stopsTwo")}</option>
+              </select>
+            </label>
+            <label className="field">
+              {t("durationMax")}
+              <input className="qs-input" type="number" min={0} value={durationMax} onChange={(e) => setDurationMax(e.target.value)} placeholder="240" />
+            </label>
+            <label className="field">
+              {t("riskAllowed")}
+              <select value={riskFilter} onChange={(e) => setRiskFilter(e.target.value as "all" | "low" | "medium" | "high")} className="qs-input">
+                <option value="all">{t("riskAll")}</option>
+                <option value="low">{t("riskLow")}</option>
+                <option value="medium">{t("riskMedium")}</option>
+                <option value="high">{t("riskHigh")}</option>
+              </select>
+            </label>
+            <label className="field">
+              {t("radiusLabel")}
+              <input className="qs-input" type="number" min={0} value={radiusKm} onChange={(e) => setRadiusKm(Math.max(0, Number(e.target.value)))} disabled={!radiusActive} />
+            </label>
+          </div>
+        </section>
+
         <div className="qs-actions">
           <div className="qs-search-cta">
             <button className="btn-search" type="submit" disabled={!isReady || !routeInputsValid}>
@@ -2965,6 +3032,18 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
           </div>
         </div>
       </QuickSearchSearchForm>
+
+      <section className="panel panel-soft qs-search-summary-compact section-gap-sm" aria-live="polite">
+        <div className="panel-header">
+          <h3>{locale === "es" ? "Resumen de búsqueda" : "Search summary"}</h3>
+        </div>
+        <div className="qs-summary-detail-row">
+          <span className="qs-summary-chip">{summaryTrip}</span>
+          <span className="qs-summary-chip">{summaryMeta}</span>
+          <span className="qs-summary-chip">{summaryFlex}</span>
+          <span className="qs-summary-chip">{summaryStrict}</span>
+        </div>
+      </section>
 
       <div id="qs-workspace-hint" className="qs-workspace-hint">
         {pageWorkspaceHint}
@@ -3394,6 +3473,17 @@ export function QuickSearchView({ mode = "quick-search" }: { mode?: QuickSearchM
                 </details>
               ) : null}
             </div>
+            {hasSearched && executedCriteria ? (
+              <div className="qs-executed-criteria" aria-live="polite">
+                <strong>{locale === "es" ? "Criterios usados" : "Applied criteria"}:</strong>
+                <span>{executedCriteria.route}</span>
+                <span>{executedCriteria.dateLabel}</span>
+                <span>{executedCriteria.paxLabel}</span>
+                {executedCriteria.filters.map((item) => (
+                  <span key={item} className="qs-summary-chip">{item}</span>
+                ))}
+              </div>
+            ) : null}
             <div className="qs-results-controls">
               <label className="field">
                 {t("orderBy")}
