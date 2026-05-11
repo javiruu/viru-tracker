@@ -1,11 +1,9 @@
-﻿Status: archived
-Scope: archived QA evidence or release history
-Last reviewed: 2026-04-15
-Original source: docs/archive/qa/README.md
-Related: docs/archive/README.md, docs/INDICE_UNICO.md
+﻿# Archivo de QA
 
----
-# Archivo de QA
+**Estado:** histórico  
+**Última revisión:** 2026-05-11  
+**Fuente de verdad:** no  
+**Área:** archivo
 
 Este archivo guarda evidencia fechada, actas, capturas, snapshots y reportes específicos de rondas de QA ya cerradas.
 
@@ -13,13 +11,8 @@ Este archivo guarda evidencia fechada, actas, capturas, snapshots y reportes esp
 
 - `2026-03-08/`: consolidado de ejecución, readiness, riesgos, snapshots y evidencia de ese ciclo.
 - `2026-03-09/`: benchmarks y validaciones posteriores.
-- `feature-specific/`: QA ligada a iniciativas concretas que ya no son parte del checklist base.
+- `feature-specific/`: QA ligada a iniciativas concretas ya cerradas.
 
 ## Regla de lectura
 
-- Si necesitas una guía reusable de QA, vuelve a `docs/qa/`.
-- Si necesitas evidencia exacta de una release o pruebas visuales antiguas, entra aquí.
-
-
-
-
+Consulta esta carpeta solo cuando necesites reconstruir un ciclo histórico. Para QA reutilizable usa `docs/qa/`.
