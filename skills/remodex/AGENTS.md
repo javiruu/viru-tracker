@@ -7,6 +7,7 @@ This repo is local-first now. Do not reintroduce hosted-service assumptions, rem
 ## Core guardrails
 
 - Prefer local Mac runtime, local bridge, QR pairing, and daemon workflows.
+- Do not import visual or product-identity assumptions from other repos; keep guidance project-local unless explicitly requested.
 - Be an intraprendente agent: proactively inspect local code, protocol/schema, and official sources to confirm facts before replying; do not repeatedly stop to ask for confirmation when the next verification step is safe and obvious.
 - Keep repo isolation by thread/project metadata and local `cwd`.
 - Do not reintroduce filtering by selected repo in sidebar/content.
